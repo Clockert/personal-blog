@@ -3,24 +3,13 @@ content %}
 <div class="posts-container">
   <h2>Recent Posts</h2>
 
+  {% for post in posts %}
   <article class="post-preview">
-    <h3>My First Blog Post</h3>
-    <p class="post-meta">Published on December 15, 2025</p>
-    <p class="post-excerpt">
-      This is my first blog post! I'm learning Flask and building this blog from
-      scratch. It's exciting to see everything come together.
-    </p>
+    <h3>{{ post.title }}</h3>
+    <p class="post-meta">Published on {{ post.date }}</p>
+    <p class="post-excerpt">{{ post.excerpt }}</p>
     <a href="#" class="read-more">Read more →</a>
   </article>
-
-  <article class="post-preview">
-    <h3>Learning Backend Development</h3>
-    <p class="post-meta">Published on December 14, 2025</p>
-    <p class="post-excerpt">
-      Today I'm working on understanding how Flask routing works and how to
-      render templates.
-    </p>
-    <a href="#" class="read-more">Read more →</a>
-  </article>
+  {% endfor %}
 </div>
 {% endblock %}
