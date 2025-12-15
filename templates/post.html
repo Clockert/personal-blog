@@ -2,8 +2,30 @@
 %} {% block content %}
 <div class="post-container">
   <article class="post-full">
-    <h2>{{ post.title }}</h2>
-    <p class="post-meta">Published on {{ post.date }}</p>
+    <div class="post-header-actions">
+      <div>
+        <h2>{{ post.title }}</h2>
+        <p class="post-meta">Published on {{ post.date }}</p>
+      </div>
+
+      {% if session.logged_in %}
+      <div class="post-actions">
+        <a href="/post/{{ post.id }}/edit" class="btn-icon" title="Edit post">
+          <span class="material-symbols-outlined">edit</span>
+        </a>
+        <form
+          method="POST"
+          action="/post/{{ post.id }}/delete"
+          style="display: inline"
+          onsubmit="return confirm('Are you sure you want to delete this post?');"
+        >
+          <button type="submit" class="btn-icon btn-delete" title="Delete post">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
 
     {% if post.tags %}
     <div class="post-tags">

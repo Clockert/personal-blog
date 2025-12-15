@@ -43,6 +43,24 @@ def create_post(title, date, content, excerpt, image_url, tags):
     conn.commit()
     conn.close()
 
+def update_post(post_id, title, date, content, excerpt, image_url, tags):
+    """Update an existing post in the database"""
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE posts 
+        SET title = ?, date = ?, content = ?, excerpt = ?, image_url = ?, tags = ?
+        WHERE id = ?
+    ''', (title, date, content, excerpt, image_url, tags, post_id))
+    conn.commit()
+    conn.close()
+
+def delete_post(post_id):
+    """Delete a post from the database"""
+    conn = get_db_connection()
+    conn.execute('DELETE FROM posts WHERE id = ?', (post_id,))
+    conn.commit()
+    conn.close()
+
 # Only run this if we're running this file directly
 if __name__ == '__main__':
     init_db()
