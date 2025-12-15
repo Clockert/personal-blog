@@ -1,6 +1,6 @@
 # Import Flask, render_template, and our database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post
+from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags
 import os
 from dotenv import load_dotenv
 
@@ -21,7 +21,8 @@ ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 @app.route('/')
 def home():
     posts = get_all_posts()
-    return render_template('home.html', posts=posts)
+    tags = get_all_tags()
+    return render_template('home.html', posts=posts, tags=tags)
 
 # Individual post route
 @app.route('/post/<int:post_id>')
@@ -86,8 +87,9 @@ def new_post():
         flash('Post created successfully!', 'success')
         return redirect(url_for('home'))
     
-    # GET request - show the form
-    return render_template('new_post.html')
+    # GET request - show the form with existing tags
+    existing_tags = get_all_tags()
+    return render_template('new_post.html', existing_tags=existing_tags)
 
 # Edit post route
 @app.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
@@ -118,8 +120,9 @@ def edit_post(post_id):
         flash('Post updated successfully!', 'success')
         return redirect(url_for('post', post_id=post_id))
     
-    # GET request - show the form with existing data
-    return render_template('edit_post.html', post=post)
+    # GET request - show the form with existing data and existing tags
+    existing_tags = get_all_tags()
+    return render_template('edit_post.html', post=post, existing_tags=existing_tags)
 
 # Delete post route
 @app.route('/post/<int:post_id>/delete', methods=['POST'])
@@ -134,6 +137,14 @@ def delete_post_route(post_id):
     
     flash('Post deleted successfully!', 'success')
     return redirect(url_for('home'))
+
+# Tag filter route
+@app.route('/tag/<tag_name>')
+def filter_by_tag(tag_name):
+    posts = get_posts_by_tag(tag_name)
+    return render_template('tag_filter.html', posts=posts, tag=tag_name)
+
+
 
 # Run the application
 if __name__ == '__main__':
