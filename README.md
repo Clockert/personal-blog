@@ -4,20 +4,26 @@ A blogging application I'm building for my Backend Essentials course project. Le
 
 ## What I'm Building
 
-A blog where I can:
-- Write and publish blog posts
-- Add comments to posts
-- Organize posts with tags
-- Edit existing posts
-- Secure admin access with login
+A fully-featured blog with:
 
-This project is helping me practice backend development, database management, and writing secure code.
+- Write, edit, and delete blog posts
+- Comment system with author names
+- Tag organization and filtering
+- Post sorting (date/title)
+- Image support for posts
+- Secure admin authentication
+- Norwegian date formatting
+- Custom 404 error page
+- About page
+
+This project helped me practice backend development, database management, and writing secure code.
 
 ## Development Progress
 
 Building this incrementally, starting simple and adding features step by step.
 
 ### ✅ Phase 0: Foundation (Complete!)
+
 - [x] Set up project structure
 - [x] Create virtual environment
 - [x] Install Flask
@@ -25,6 +31,7 @@ Building this incrementally, starting simple and adding features step by step.
 - [x] First git commit
 
 ### ✅ Phase 1: Static Templates (Complete!)
+
 - [x] Create base template with Jinja2 blocks
 - [x] Build home page template
 - [x] Build individual post template
@@ -32,6 +39,7 @@ Building this incrementally, starting simple and adding features step by step.
 - [x] Display hardcoded posts using loops
 
 ### ✅ Phase 2: Database (Complete!)
+
 - [x] Design database schema
 - [x] Create schema.sql file
 - [x] Build database.py module with query functions
@@ -39,6 +47,7 @@ Building this incrementally, starting simple and adding features step by step.
 - [x] Add sample posts to database
 
 ### ✅ Phase 3: Reading Posts (Complete!)
+
 - [x] Display all posts on home page (newest first)
 - [x] Individual post pages with full content
 - [x] Working navigation between pages
@@ -46,31 +55,46 @@ Building this incrementally, starting simple and adding features step by step.
 - [x] Dynamic routing with post IDs
 
 ### ✅ Login System (Complete!)
+
 - [x] User authentication with Flask sessions
 - [x] Login/logout functionality
 - [x] Protected routes
 - [x] Flash messages for user feedback
 - [x] Environment variables for credentials
 
-### 🔄 Phase 4: Creating Content (In Progress)
-- [ ] "New Post" button (visible when logged in)
-- [ ] Form to create blog posts
-- [ ] Handle form submission
-- [ ] Insert new posts into database
-- [ ] Form validation
+### ✅ Phase 4: Creating Content (Complete!)
 
-### 📋 Phase 5: Editing & Tags (Planned)
-- [ ] Edit existing posts
-- [ ] Update posts in database
-- [ ] Tag filtering page
-- [ ] Attach/manage tags
+- [x] "New Post" button (visible when logged in)
+- [x] Form to create blog posts
+- [x] Handle form submission
+- [x] Insert new posts into database
+- [x] Form validation
 
-### 🧪 Phase 6: Security & Testing (Planned)
-- [ ] Input validation and sanitization
-- [ ] Parameterized queries (SQL injection prevention)
-- [ ] HTML escaping (XSS prevention)
-- [ ] Integration tests
-- [ ] End-to-end tests
+### ✅ Phase 5: Editing & Tags (Complete!)
+
+- [x] Edit existing posts
+- [x] Update posts in database
+- [x] Delete posts functionality
+- [x] Tag filtering page
+- [x] Attach/manage tags
+- [x] Browse tags section
+
+### ✅ Phase 6: Comments System (Complete!)
+
+- [x] Comment form on post pages
+- [x] Display comments with timestamps
+- [x] Delete comments (admin only)
+- [x] Comment author field
+
+### ✅ Phase 7: Enhancements (Complete!)
+
+- [x] Post sorting (newest/oldest/alphabetical)
+- [x] Norwegian date formatting
+- [x] About page
+- [x] Custom 404 page
+- [x] Post images support
+- [x] Tag suggestions in forms
+- [x] Improved UI/UX
 
 ## Technologies Used
 
@@ -81,6 +105,7 @@ Building this incrementally, starting simple and adding features step by step.
 - **Security:** Flask sessions, environment variables
 
 ## Project Structure
+
 ```
 personal-blog/
 ├── app.py                 # Main Flask application
@@ -90,23 +115,31 @@ personal-blog/
 ├── .env                  # Environment variables (not in git)
 ├── requirements.txt      # Python dependencies
 ├── templates/
-│   ├── base.html        # Base template
-│   ├── home.html        # Home page
-│   ├── post.html        # Individual post
-│   └── login.html       # Login page
+│   ├── base.html        # Base template with header/footer
+│   ├── home.html        # Home page with posts list
+│   ├── post.html        # Individual post with comments
+│   ├── login.html       # Login page
+│   ├── new_post.html    # Create new post form
+│   ├── edit_post.html   # Edit post form
+│   ├── tag_filter.html  # Filtered posts by tag
+│   ├── about.html       # About page
+│   └── 404.html         # Custom 404 error page
 ├── static/
-│   └── style.css        # Styling
-└── tests/               # Tests (coming soon)
+│   ├── style.css        # Complete styling system
+│   └── logo.png         # Blog logo
+└── .gitignore           # Git ignore file
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
+
 - Python 3.8+
 - pip
 - Git
 
 ### Installation
+
 ```bash
 # Clone the repository
 git clone [your-repo-url]
@@ -134,26 +167,31 @@ python app.py
 Visit `http://localhost:5000`
 
 ### Login Credentials
+
 Set these in your `.env` file (see `.env.example`)
 
 ## Current Status
 
-**Phase:** 4 - Creating Content (In Progress)
+**Phase:** Complete! All planned features implemented
 
-**What's Working:**
-- Full blog reading experience
-- User authentication system
-- Dynamic routing and navigation
-- Tag display
-- Database-driven content
+**Features:**
 
-**What I'm Working On:**
-- Building the "Create New Post" form
-- Protecting routes to require login
+- ✅ Full CRUD operations (Create, Read, Update, Delete) for posts
+- ✅ Comment system with delete functionality
+- ✅ Tag-based filtering and organization
+- ✅ Post sorting (newest/oldest/alphabetical)
+- ✅ User authentication with protected routes
+- ✅ Norwegian date formatting (DD mon YYYY)
+- ✅ Image support for blog posts
+- ✅ Custom 404 error handling
+- ✅ About page
+- ✅ Responsive UI
+- ✅ Flash messages for user feedback
 
 ## Learning Notes
 
 Key things I've learned:
+
 - Virtual environments keep project dependencies isolated
 - `@app.route()` decorator maps URLs to Python functions
 - Jinja2 templates let you separate logic from presentation
@@ -164,51 +202,52 @@ Key things I've learned:
 
 ## Challenges & Solutions
 
-*(These are documented in more detail in my reflective journal)*
+_(These are documented in more detail in my reflective journal)_
 
 ### Terminal Navigation
+
 - **Challenge:** Not comfortable with terminal commands - usually use GUI tools
-  - **Solution:** Learned that VS Code has an integrated terminal that opens directly in my project folder. Started with just a few essential commands: `python app.py`, `source venv/bin/activate`, and `python`. Getting more comfortable with practice.
+  - **Solution:** Started to use VS Codes integrated terminal that opens directly in my project folder. Started with just a few essential commands: `python app.py`, `source venv/bin/activate`, and `python`. Getting more comfortable with practice.
 
 ### Understanding Flask's Request-Response Cycle
+
 - **Challenge:** Understanding how `@app.route()` connects URLs to Python functions
   - **Solution:** Started with simplest possible "Hello World", then gradually added complexity. Drawing out the flow helped: Browser → Flask route → Python function → Template → Browser
 
 ### Moving from Hardcoded Data to Database
-- **Challenge:** Had working code with Python lists, felt risky to change everything
-  - **Solution:** Used Git branches! Created `add-database` branch so I could experiment without breaking working code. Could always go back if needed. This made me feel safe to try new things.
+
+- **Challenge:** Had working code with Python lists, felt scary to change everything
+  - **Solution:** Used Git branches, Created `add-database` branch so I could experiment without breaking working code. Could always go back if needed. This made me feel safe to try new things.
 
 ### Python Interactive Shell for Database
-- **Challenge:** Adding data to database using Python shell was confusing - didn't understand the `>>>` prompt
+
+- **Challenge:** Adding data to database using Python shell was confusing - didn't fully understand the `>>>` prompt
   - **Solution:** Realized the Python shell is just typing Python commands one at a time instead of in a file. Used it to test database queries before adding them to my code.
 
-### Git Workflow with Branches
-- **Challenge:** At first added features directly to main, then learned I should use branches
-  - **Solution:** Started creating branches for major features. Made one mistake and added tags to main instead of a branch - learned from it! Now more comfortable with branch → develop → merge workflow.
-
 ### Sessions and Login State
+
 - **Challenge:** Understanding how Flask "remembers" that I'm logged in between page loads
   - **Solution:** Learned that sessions store data in encrypted cookies. The `session['logged_in']` is stored in the browser and sent with each request. This clicked when I saw the logout function removing it from the session.
 
-### Environment Variables and Security
-- **Challenge:** Wasn't sure why we needed a separate .env file
-  - **Solution:** Realized that if I push my code to GitHub, everyone could see my password if it's in the code! .env file + .gitignore keeps secrets local. This is important for real-world projects.
+## Potential Future Enhancements
 
-## Future Enhancements
+Ideas for further development:
 
-If time permits:
-- Comment system
-- Delete functionality
-- Advanced tag filtering
-- Rich text editor
-- Search functionality
-- Multiple users
+- Rich text editor for markdown support
+- More options for images
+- Search functionality across posts
+- Multiple user roles (admin, editor, viewer)
+- Post drafts and scheduling
+- Comment replies/threading
+- Email notifications
+- Post categories (in addition to tags)
+- Better Design and personalisation
 
 ## Course Information
 
 Backend Essentials - Project Assignment
-Building a personal blogging application from scratch
+Building a personal blogging application
 
 ---
 
-*Last Updated: December 2024*
+_Last Updated: December 2025_
