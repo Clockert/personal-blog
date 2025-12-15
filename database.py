@@ -33,6 +33,16 @@ def get_post_by_id(post_id):
     conn.close()
     return post
 
+def create_post(title, date, content, excerpt, image_url, tags):
+    """Insert a new post into the database"""
+    conn = get_db_connection()
+    conn.execute('''
+        INSERT INTO posts (title, date, content, excerpt, image_url, tags)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (title, date, content, excerpt, image_url, tags))
+    conn.commit()
+    conn.close()
+
 # Only run this if we're running this file directly
 if __name__ == '__main__':
     init_db()
