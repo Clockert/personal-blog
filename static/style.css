@@ -65,8 +65,6 @@ header {
   color: var(--header-text);
   padding: 3rem 1rem;
   text-align: center;
-  border-bottom-left-radius: var(--radius-xl);
-  border-bottom-right-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
 }
 
