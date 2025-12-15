@@ -24,6 +24,11 @@ def home():
     tags = get_all_tags()
     return render_template('home.html', posts=posts, tags=tags)
 
+# About page route
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 # Individual post route
 @app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
