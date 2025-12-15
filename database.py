@@ -19,10 +19,25 @@ def init_db():
     conn.close()
     print("Database initialized!")
 
-def get_all_posts():
-    """Get all posts from the database, ordered by date (newest first)"""
+def get_all_posts(sort_by='date_desc'):
+    """Get all posts from the database with various sorting options
+
+    Args:
+        sort_by: Sort order - 'date_desc', 'date_asc', 'title_asc', 'title_desc'
+    """
     conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts ORDER BY date DESC').fetchall()
+
+    # Determine ORDER BY clause based on sort_by parameter
+    if sort_by == 'date_asc':
+        order_clause = 'ORDER BY date ASC'
+    elif sort_by == 'title_asc':
+        order_clause = 'ORDER BY title ASC'
+    elif sort_by == 'title_desc':
+        order_clause = 'ORDER BY title DESC'
+    else:  # default to date_desc
+        order_clause = 'ORDER BY date DESC'
+
+    posts = conn.execute(f'SELECT * FROM posts {order_clause}').fetchall()
     conn.close()
     return posts
 

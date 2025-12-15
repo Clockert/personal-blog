@@ -8,25 +8,37 @@ content %}
     {% endif %}
   </div>
 
-  <!-- Browse by Tags Section -->
-  {% if tags %}
-  <div class="tags-browse">
-    <h3 class="tags-toggle" onclick="toggleTags()">
-      <span class="toggle-content">
+  <!-- Filter and Sort Bar -->
+  <div class="filter-sort-bar">
+    <!-- Browse by Tags Section -->
+    {% if tags %}
+    <div class="tags-section">
+      <div class="tags-toggle-inline" onclick="toggleTags()">
         <span class="material-symbols-outlined">label</span>
-        Browse by Tag
-      </span>
-      <span class="material-symbols-outlined chevron" id="chevron"
-        >expand_more</span
-      >
-    </h3>
-    <div class="tags-list" id="tagsList" style="display: none">
-      {% for tag in tags %}
-      <a href="/tag/{{ tag }}" class="tag tag-browse">{{ tag }}</a>
-      {% endfor %}
+        <span>Browse Tags</span>
+        <span class="material-symbols-outlined chevron" id="chevron">expand_more</span>
+      </div>
+      <div class="tags-list-inline" id="tagsList" style="display: none">
+        {% for tag in tags %}
+        <a href="/tag/{{ tag }}" class="tag tag-browse">{{ tag }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Sort Dropdown -->
+    <div class="sort-dropdown">
+      <label for="sortSelect">Sort by:</label>
+      <select id="sortSelect" onchange="window.location.href='/?sort=' + this.value">
+        <option value="date_desc" {% if current_sort == 'date_desc' %}selected{% endif %}>Newest First</option>
+        <option value="date_asc" {% if current_sort == 'date_asc' %}selected{% endif %}>Oldest First</option>
+        <option value="title_asc" {% if current_sort == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
+        <option value="title_desc" {% if current_sort == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
+      </select>
     </div>
   </div>
-  {% endif %} {% for post in posts %}
+
+  {% for post in posts %}
   <article class="post-preview">
     {% if post.image_url %}
     <div class="post-image">

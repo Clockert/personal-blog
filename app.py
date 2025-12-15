@@ -20,9 +20,11 @@ ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 # Home page route
 @app.route('/')
 def home():
-    posts = get_all_posts()
+    # Get sort parameter from query string, default to 'date_desc'
+    sort_by = request.args.get('sort', 'date_desc')
+    posts = get_all_posts(sort_by)
     tags = get_all_tags()
-    return render_template('home.html', posts=posts, tags=tags)
+    return render_template('home.html', posts=posts, tags=tags, current_sort=sort_by)
 
 # About page route
 @app.route('/about')
