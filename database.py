@@ -61,6 +61,35 @@ def delete_post(post_id):
     conn.commit()
     conn.close()
 
+def get_posts_by_tag(tag):
+    """Get all posts that contain a specific tag"""
+    conn = get_db_connection()
+    # Use LIKE to search for the tag in the tags column
+    # Add wildcards to match tag anywhere in the string
+    posts = conn.execute(
+        "SELECT * FROM posts WHERE tags LIKE ? ORDER BY date DESC",
+        (f'%{tag}%',)
+    ).fetchall()
+    conn.close()
+    return posts
+
+def get_all_tags():
+    """Get all unique tags from all posts"""
+    conn = get_db_connection()
+    posts = conn.execute('SELECT tags FROM posts WHERE tags IS NOT NULL AND tags != ""').fetchall()
+    conn.close()
+    
+    # Collect all unique tags
+    all_tags = set()
+    for post in posts:
+        if post['tags']:
+            # Split tags and add to set (removes duplicates)
+            tags = [tag.strip() for tag in post['tags'].split(',')]
+            all_tags.update(tags)
+    
+    # Return as sorted list
+    return sorted(all_tags)
+
 # Only run this if we're running this file directly
 if __name__ == '__main__':
     init_db()

@@ -34,6 +34,19 @@ block content %}
         placeholder="python, flask, learning"
       />
       <small>Separate tags with commas</small>
+
+      {% if existing_tags %}
+      <div class="existing-tags">
+        <small><strong>Existing tags:</strong></small>
+        <div class="tag-suggestions">
+          {% for tag in existing_tags %}
+          <span class="tag-suggestion" onclick="addTag('{{ tag }}')"
+            >{{ tag }}</span
+          >
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </div>
 
     <div class="form-group">
@@ -52,4 +65,22 @@ block content %}
     </div>
   </form>
 </div>
+
+<script>
+  function addTag(tag) {
+    const tagsInput = document.getElementById("tags");
+    const currentTags = tagsInput.value;
+
+    // If input is empty, just add the tag
+    if (currentTags.trim() === "") {
+      tagsInput.value = tag;
+    } else {
+      // Add comma and tag
+      tagsInput.value = currentTags + ", " + tag;
+    }
+
+    // Focus back on input
+    tagsInput.focus();
+  }
+</script>
 {% endblock %}

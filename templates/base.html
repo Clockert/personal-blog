@@ -40,7 +40,22 @@
     </main>
 
     <footer>
-      <p>&copy; 2025 My Blog. Built with Flask.</p>
+      <p>&copy; 2025 My Blog. Charlotte Lockert.</p>
     </footer>
+
+    <script>
+      function toggleTags() {
+        const tagsList = document.getElementById("tagsList");
+        const chevron = document.getElementById("chevron");
+
+        if (tagsList.style.display === "none") {
+          tagsList.style.display = "flex";
+          chevron.textContent = "expand_less";
+        } else {
+          tagsList.style.display = "none";
+          chevron.textContent = "expand_more";
+        }
+      }
+    </script>
   </body>
 </html>
