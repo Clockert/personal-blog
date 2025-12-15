@@ -166,7 +166,7 @@ footer {
 
 /* INDIVIDUAL POST PAGE */
 .post-container {
-  max-width: 750px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -682,6 +682,29 @@ footer {
   margin-bottom: 1rem;
 }
 
+.comment-form input,
+.comment-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.comment-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
 .comment-form .btn-primary {
   width: auto;
   padding: 0.6rem 1.5rem;
@@ -849,4 +872,25 @@ footer {
 .course-info p {
   color: var(--color-text);
   line-height: 1.8;
+}
+
+.error-container {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.error-content h1 {
+  font-size: 6rem;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.error-content h2 {
+  color: var(--color-heading);
+  margin-bottom: 1rem;
+}
+
+.error-content p {
+  color: var(--color-text);
+  margin-bottom: 2rem;
 }
