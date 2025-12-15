@@ -90,7 +90,25 @@
             <span class="material-symbols-outlined">person</span>
             {{ comment.author }}
           </span>
-          <span class="comment-date">{{ comment.date }}</span>
+          <div class="comment-meta">
+            <span class="comment-date">{{ comment.date }}</span>
+            {% if session.logged_in %}
+            <form
+              method="POST"
+              action="/comment/{{ comment.id }}/delete"
+              style="display: inline"
+              onsubmit="return confirm('Delete this comment?');"
+            >
+              <button
+                type="submit"
+                class="btn-icon btn-icon-small btn-delete"
+                title="Delete comment"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </form>
+            {% endif %}
+          </div>
         </div>
         <div class="comment-text">{{ comment.comment_text }}</div>
       </div>

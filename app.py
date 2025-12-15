@@ -1,6 +1,6 @@
 # Import Flask, render_template, and our database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment
+from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment
 import os
 from dotenv import load_dotenv
 
@@ -155,6 +155,28 @@ def delete_post_route(post_id):
     
     flash('Post deleted successfully!', 'success')
     return redirect(url_for('home'))
+
+# Delete comment route
+@app.route('/comment/<int:comment_id>/delete', methods=['POST'])
+def delete_comment_route(comment_id):
+    # Check if user is logged in
+    if not session.get('logged_in'):
+        flash('Please log in to delete comments', 'error')
+        return redirect(url_for('login'))
+    
+    # Get the comment to find which post it belongs to
+    conn = get_db_connection()
+    comment = conn.execute('SELECT post_id FROM comments WHERE id = ?', (comment_id,)).fetchone()
+    conn.close()
+    
+    if comment:
+        post_id = comment['post_id']
+        delete_comment(comment_id)
+        flash('Comment deleted successfully!', 'success')
+        return redirect(url_for('post', post_id=post_id))
+    else:
+        flash('Comment not found', 'error')
+        return redirect(url_for('home'))
 
 # Tag filter route
 @app.route('/tag/<tag_name>')

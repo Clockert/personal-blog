@@ -712,6 +712,12 @@ footer {
   gap: 0.5rem;
 }
 
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .comment-author {
   font-weight: 600;
   color: var(--color-heading);
@@ -742,4 +748,12 @@ footer {
   background: var(--color-card-bg);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-card-border);
+}
+
+.btn-icon-small {
+  padding: 0.25rem;
+}
+
+.btn-icon-small .material-symbols-outlined {
+  font-size: 16px;
 }

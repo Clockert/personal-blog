@@ -110,6 +110,13 @@ def create_comment(post_id, author, comment_text, date):
     conn.commit()
     conn.close()
 
+def delete_comment(comment_id):
+    """Delete a comment from the database"""
+    conn = get_db_connection()
+    conn.execute('DELETE FROM comments WHERE id = ?', (comment_id,))
+    conn.commit()
+    conn.close()
+
 # Only run this if we're running this file directly
 if __name__ == '__main__':
     init_db()
