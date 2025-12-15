@@ -42,6 +42,24 @@ def home():
     # Pass the posts data to the template
     return render_template('home.html', posts=posts)
 
+# Define a route for individual posts
+# <int:post_id> means this part of the URL will be a number
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    # Find the post with matching id
+    post = None
+    for p in posts:
+        if p['id'] == post_id:
+            post = p
+            break
+    
+    # If post not found, show error message
+    if post is None:
+        return "Post not found!", 404
+    
+    # Render the post template with the found post
+    return render_template('post.html', post=post)
+
 # Run the application
 if __name__ == '__main__':
     app.run(debug=True)

@@ -8,7 +8,7 @@ content %}
     <h3>{{ post.title }}</h3>
     <p class="post-meta">Published on {{ post.date }}</p>
     <p class="post-excerpt">{{ post.excerpt }}</p>
-    <a href="#" class="read-more">Read more →</a>
+    <a href="/post/{{ post.id }}" class="read-more">Read more →</a>
   </article>
   {% endfor %}
 </div>

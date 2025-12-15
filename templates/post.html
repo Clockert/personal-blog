@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block title %}{{ post.title }} - My Blog{% endblock
+%} {% block content %}
+<div class="post-container">
+  <article class="post-full">
+    <h2>{{ post.title }}</h2>
+    <p class="post-meta">Published on {{ post.date }}</p>
+
+    <div class="post-content">{{ post.content }}</div>
+
+    <a href="/" class="back-link">← Back to all posts</a>
+  </article>
+</div>
+{% endblock %}
