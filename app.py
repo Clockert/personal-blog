@@ -164,19 +164,13 @@ def delete_comment_route(comment_id):
         flash('Please log in to delete comments', 'error')
         return redirect(url_for('login'))
     
-    # Get the comment to find which post it belongs to
-    conn = get_db_connection()
-    comment = conn.execute('SELECT post_id FROM comments WHERE id = ?', (comment_id,)).fetchone()
-    conn.close()
+    # Delete the comment
+    delete_comment(comment_id)
+    flash('Comment deleted successfully!', 'success')
     
-    if comment:
-        post_id = comment['post_id']
-        delete_comment(comment_id)
-        flash('Comment deleted successfully!', 'success')
-        return redirect(url_for('post', post_id=post_id))
-    else:
-        flash('Comment not found', 'error')
-        return redirect(url_for('home'))
+    # Redirect back to the post page
+    return redirect(request.referrer or url_for('home'))
+
 
 # Tag filter route
 @app.route('/tag/<tag_name>')
