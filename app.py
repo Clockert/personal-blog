@@ -1,6 +1,6 @@
 # Import Flask, render_template, and our database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags
+from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment
 import os
 from dotenv import load_dotenv
 
@@ -25,12 +25,30 @@ def home():
     return render_template('home.html', posts=posts, tags=tags)
 
 # Individual post route
-@app.route('/post/<int:post_id>')
+@app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
     post = get_post_by_id(post_id)
     if post is None:
         return "Post not found!", 404
-    return render_template('post.html', post=post)
+    
+    # Handle comment submission
+    if request.method == 'POST':
+        author = request.form.get('author', 'Anonymous')
+        comment_text = request.form.get('comment_text')
+        
+        if comment_text:
+            from datetime import datetime
+            date = datetime.now().strftime('%Y-%m-%d %H:%M')
+            create_comment(post_id, author, comment_text, date)
+            flash('Comment added successfully!', 'success')
+            return redirect(url_for('post', post_id=post_id))
+        else:
+            flash('Comment cannot be empty', 'error')
+    
+    # Get comments for this post
+    comments = get_comments_for_post(post_id)
+    
+    return render_template('post.html', post=post, comments=comments)
 
 # Login page route
 @app.route('/login', methods=['GET', 'POST'])

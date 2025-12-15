@@ -90,6 +90,26 @@ def get_all_tags():
     # Return as sorted list
     return sorted(all_tags)
 
+def get_comments_for_post(post_id):
+    """Get all comments for a specific post, ordered by date (newest first)"""
+    conn = get_db_connection()
+    comments = conn.execute(
+        'SELECT * FROM comments WHERE post_id = ? ORDER BY date DESC',
+        (post_id,)
+    ).fetchall()
+    conn.close()
+    return comments
+
+def create_comment(post_id, author, comment_text, date):
+    """Insert a new comment into the database"""
+    conn = get_db_connection()
+    conn.execute('''
+        INSERT INTO comments (post_id, author, comment_text, date)
+        VALUES (?, ?, ?, ?)
+    ''', (post_id, author, comment_text, date))
+    conn.commit()
+    conn.close()
+
 # Only run this if we're running this file directly
 if __name__ == '__main__':
     init_db()
