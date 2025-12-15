@@ -16,16 +16,24 @@
   </head>
   <body>
     <header>
-      <h1>Blog - Backend Essentials</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        {% if session.logged_in %}
-        <a href="/logout">Logout</a>
-        {% else %}
-        <a href="/login">Login</a>
-        {% endif %}
-      </nav>
+      <div class="header-container">
+        <div class="header-left">
+          <a href="/" class="logo-link">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Blog Logo" class="logo" />
+          </a>
+          <nav class="main-nav">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+          </nav>
+        </div>
+        <nav class="auth-nav">
+          {% if session.logged_in %}
+          <a href="/logout">Logout</a>
+          {% else %}
+          <a href="/login">Login</a>
+          {% endif %}
+        </nav>
+      </div>
     </header>
 
     <main>
