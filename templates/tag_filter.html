@@ -16,7 +16,7 @@ endblock %} {% block content %}
 
     <div class="post-heading">
       <h3>{{ post.title }}</h3>
-      <p class="post-meta">Published on {{ post.date }}</p>
+      <p class="post-meta">Published on {{ post.date|norwegian_date }}</p>
 
       {% if post.tags %}
       <div class="post-tags">

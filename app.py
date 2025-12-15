@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,6 +13,30 @@ app = Flask(__name__)
 
 # Set secret key for sessions (needed for login)
 app.secret_key = os.getenv('SECRET_KEY')
+
+# Custom Jinja2 filter for Norwegian date format
+@app.template_filter('norwegian_date')
+def norwegian_date_filter(date_string):
+    """Convert date from YYYY-MM-DD to DD mon YYYY (Norwegian months)"""
+    try:
+        # Parse the date string
+        date_obj = datetime.strptime(date_string, '%Y-%m-%d')
+
+        # Norwegian month abbreviations
+        norwegian_months = {
+            1: 'jan', 2: 'feb', 3: 'mar', 4: 'apr', 5: 'mai', 6: 'jun',
+            7: 'jul', 8: 'aug', 9: 'sep', 10: 'okt', 11: 'nov', 12: 'des'
+        }
+
+        # Format as DD mon YYYY
+        day = date_obj.day
+        month = norwegian_months[date_obj.month]
+        year = date_obj.year
+
+        return f"{day:02d} {month} {year}"
+    except:
+        # If parsing fails, return original string
+        return date_string
 
 # Get admin credentials from environment
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
