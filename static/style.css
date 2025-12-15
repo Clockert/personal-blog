@@ -332,3 +332,127 @@ footer {
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
+
+/* Posts header with new post button */
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.btn-new-post {
+  background: linear-gradient(
+    135deg,
+    var(--header-bg-start),
+    var(--header-bg-end)
+  );
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-new-post:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* CREATE POST FORM */
+.form-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-container h2 {
+  color: var(--color-heading);
+  margin-bottom: 2rem;
+}
+
+.post-form {
+  background: var(--color-card-bg);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.post-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.post-form textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.post-form small {
+  display: block;
+  color: var(--color-subtle-text);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background: #e5e5e8;
+}
+
+/* POST IMAGES */
+.post-image {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.post-image-full {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.post-image-full img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+}

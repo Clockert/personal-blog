@@ -1,6 +1,6 @@
 # Import Flask, render_template, and our database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import get_all_posts, get_post_by_id
+from database import get_all_posts, get_post_by_id, create_post
 import os
 from dotenv import load_dotenv
 
@@ -59,6 +59,35 @@ def logout():
     session.pop('username', None)
     flash('You have been logged out', 'success')
     return redirect(url_for('home'))
+
+# Create new post route (GET shows form, POST saves post)
+@app.route('/post/new', methods=['GET', 'POST'])
+def new_post():
+    # Check if user is logged in
+    if not session.get('logged_in'):
+        flash('Please log in to create posts', 'error')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        # Get form data
+        title = request.form['title']
+        content = request.form['content']
+        excerpt = request.form['excerpt']
+        tags = request.form.get('tags', '')  # Optional field
+        image_url = request.form.get('image_url', None)  # Optional field
+        
+        # Get current date
+        from datetime import datetime
+        date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Insert into database
+        create_post(title, date, content, excerpt, image_url, tags)
+        
+        flash('Post created successfully!', 'success')
+        return redirect(url_for('home'))
+    
+    # GET request - show the form
+    return render_template('new_post.html')
 
 # Run the application
 if __name__ == '__main__':

@@ -1,10 +1,21 @@
 {% extends "base.html" %} {% block title %}Home - My Blog{% endblock %} {% block
 content %}
 <div class="posts-container">
-  <h2>Recent Posts</h2>
+  <div class="posts-header">
+    <h2>Recent Posts</h2>
+    {% if session.logged_in %}
+    <a href="/post/new" class="btn-new-post">+ New Post</a>
+    {% endif %}
+  </div>
 
   {% for post in posts %}
   <article class="post-preview">
+    {% if post.image_url %}
+    <div class="post-image">
+      <img src="{{ post.image_url }}" alt="{{ post.title }}" />
+    </div>
+    {% endif %}
+
     <div class="post-heading">
       <h3>{{ post.title }}</h3>
       <p class="post-meta">Published on {{ post.date }}</p>
@@ -20,7 +31,7 @@ content %}
 
     <p class="post-excerpt">{{ post.excerpt }}</p>
 
-    <a href="/post/{{ post.id }}" class="read-more"> Read more → </a>
+    <a href="/post/{{ post.id }}" class="read-more">Read more →</a>
   </article>
   {% endfor %}
 </div>

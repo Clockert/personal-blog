@@ -11,6 +11,10 @@
       <span class="tag">{{ tag }}</span>
       {% endfor %}
     </div>
+    {% endif %} {% if post.image_url %}
+    <div class="post-image-full">
+      <img src="{{ post.image_url }}" alt="{{ post.title }}" />
+    </div>
     {% endif %}
 
     <div class="post-content">{{ post.content }}</div>
