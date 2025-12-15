@@ -1,4 +1,4 @@
-# Import Flask, render_template, and our database functions
+# Import Flask, render_template, and database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment
 import os
