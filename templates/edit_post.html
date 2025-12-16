@@ -3,7 +3,7 @@ block content %}
 <div class="form-container">
   <h2>Edit Post</h2>
 
-  <form method="POST" action="/post/{{ post.id }}/edit" class="post-form">
+  <form method="POST" action="/blog/{{ post.id }}/edit" class="post-form" enctype="multipart/form-data">
     <div class="form-group">
       <label for="title">Title *</label>
       <input
@@ -61,14 +61,52 @@ block content %}
     </div>
 
     <div class="form-group">
-      <label for="image_url">Image URL (optional)</label>
-      <input
-        type="text"
-        id="image_url"
-        name="image_url"
-        value="{{ post.image_url or '' }}"
-        placeholder="image.jpg"
-      />
+      <label>Image (optional)</label>
+      {% if post.image_url %}
+      <div class="current-image-preview">
+        <small><strong>Current image:</strong></small>
+        <img src="{{ post.image_url }}" alt="Current post image" style="max-width: 200px; max-height: 150px; display: block; margin: 8px 0;" />
+        <small>You can upload a new image or change the URL below</small>
+      </div>
+      {% endif %}
+
+      <div class="image-option-selector">
+        <label>
+          <input type="radio" name="image_option" value="upload" onclick="toggleImageInput('upload')" {% if not post.image_url %}checked{% endif %} />
+          Upload New Image
+        </label>
+        <label>
+          <input type="radio" name="image_option" value="url" onclick="toggleImageInput('url')" />
+          Use Image URL
+        </label>
+        {% if post.image_url %}
+        <label>
+          <input type="radio" name="image_option" value="keep" onclick="toggleImageInput('keep')" checked />
+          Keep Current Image
+        </label>
+        {% endif %}
+      </div>
+
+      <div id="upload-section" class="image-input-section">
+        <input
+          type="file"
+          id="image_file"
+          name="image_file"
+          accept="image/*"
+        />
+        <small>Accepted formats: JPG, PNG, GIF, WebP (max 5MB)</small>
+      </div>
+
+      <div id="url-section" class="image-input-section">
+        <input
+          type="text"
+          id="image_url"
+          name="image_url"
+          value="{{ post.image_url or '' }}"
+          placeholder="https://example.com/image.jpg"
+        />
+        <small>Enter a complete image URL</small>
+      </div>
     </div>
 
     <div class="form-actions">
@@ -94,5 +132,33 @@ block content %}
     // Focus back on input
     tagsInput.focus();
   }
+
+  function toggleImageInput(option) {
+    const uploadSection = document.getElementById("upload-section");
+    const urlSection = document.getElementById("url-section");
+
+    if (option === "upload") {
+      uploadSection.style.display = "block";
+      urlSection.style.display = "none";
+      document.getElementById("image_url").value = "";
+    } else if (option === "url") {
+      uploadSection.style.display = "none";
+      urlSection.style.display = "block";
+      document.getElementById("image_file").value = "";
+    } else {
+      // Keep current image
+      uploadSection.style.display = "none";
+      urlSection.style.display = "none";
+      document.getElementById("image_file").value = "";
+    }
+  }
+
+  // Set initial display state on page load
+  document.addEventListener("DOMContentLoaded", function() {
+    const checkedOption = document.querySelector('input[name="image_option"]:checked');
+    if (checkedOption) {
+      toggleImageInput(checkedOption.value);
+    }
+  });
 </script>
 {% endblock %}

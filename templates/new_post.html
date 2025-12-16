@@ -3,7 +3,7 @@ block content %}
 <div class="form-container">
   <h2>Create New Post</h2>
 
-  <form method="POST" action="/post/new" class="post-form">
+  <form method="POST" action="/blog/new" class="post-form" enctype="multipart/form-data">
     <div class="form-group">
       <label for="title">Title *</label>
       <input type="text" id="title" name="title" required />
@@ -50,13 +50,37 @@ block content %}
     </div>
 
     <div class="form-group">
-      <label for="image_url">Image URL (optional)</label>
-      <input
-        type="text"
-        id="image_url"
-        name="image_url"
-        placeholder="image.jpg"
-      />
+      <label>Image (optional)</label>
+      <div class="image-option-selector">
+        <label>
+          <input type="radio" name="image_option" value="upload" onclick="toggleImageInput('upload')" checked />
+          Upload Image
+        </label>
+        <label>
+          <input type="radio" name="image_option" value="url" onclick="toggleImageInput('url')" />
+          Use Image URL
+        </label>
+      </div>
+
+      <div id="upload-section" class="image-input-section">
+        <input
+          type="file"
+          id="image_file"
+          name="image_file"
+          accept="image/*"
+        />
+        <small>Accepted formats: JPG, PNG, GIF, WebP (max 5MB)</small>
+      </div>
+
+      <div id="url-section" class="image-input-section" style="display: none;">
+        <input
+          type="text"
+          id="image_url"
+          name="image_url"
+          placeholder="https://example.com/image.jpg"
+        />
+        <small>Enter a complete image URL</small>
+      </div>
     </div>
 
     <div class="form-actions">
@@ -81,6 +105,21 @@ block content %}
 
     // Focus back on input
     tagsInput.focus();
+  }
+
+  function toggleImageInput(option) {
+    const uploadSection = document.getElementById("upload-section");
+    const urlSection = document.getElementById("url-section");
+
+    if (option === "upload") {
+      uploadSection.style.display = "block";
+      urlSection.style.display = "none";
+      document.getElementById("image_url").value = "";
+    } else {
+      uploadSection.style.display = "none";
+      urlSection.style.display = "block";
+      document.getElementById("image_file").value = "";
+    }
   }
 </script>
 {% endblock %}
