@@ -3,7 +3,12 @@ block content %}
 <div class="form-container">
   <h2>Edit Post</h2>
 
-  <form method="POST" action="/post/{{ post.id }}/edit" class="post-form">
+  <form
+    method="POST"
+    action="/blog/{{ post.id }}/edit"
+    class="post-form"
+    enctype="multipart/form-data"
+  >
     <div class="form-group">
       <label for="title">Title *</label>
       <input
@@ -61,19 +66,78 @@ block content %}
     </div>
 
     <div class="form-group">
-      <label for="image_url">Image URL (optional)</label>
+      <label>Image (optional)</label>
+      {% if post.image_url %}
+      <div class="current-image">
+        <small><strong>Current image:</strong></small>
+        <img
+          src="{{ post.image_url }}"
+          alt="Current post image"
+          class="current-image-preview"
+        />
+      </div>
+      {% endif %}
+
+      <div class="image-upload-options">
+        <div class="upload-option">
+          <input
+            type="radio"
+            id="upload-file"
+            name="image_option"
+            value="file"
+            {% if not post.image_url %}checked{% endif %}
+            onchange="toggleImageInput()"
+          />
+          <label for="upload-file">Upload New Image</label>
+        </div>
+        <div class="upload-option">
+          <input
+            type="radio"
+            id="upload-url"
+            name="image_option"
+            value="url"
+            {% if post.image_url %}checked{% endif %}
+            onchange="toggleImageInput()"
+          />
+          <label for="upload-url">Image URL</label>
+        </div>
+        <div class="upload-option">
+          <input
+            type="radio"
+            id="keep-current"
+            name="image_option"
+            value="keep"
+            onchange="toggleImageInput()"
+          />
+          <label for="keep-current">Keep Current</label>
+        </div>
+      </div>
+
+      <input
+        type="file"
+        id="image_file"
+        name="image_file"
+        accept="image/*"
+        class="image-input"
+        {% if post.image_url %}style="display: none;"{% endif %}
+      />
       <input
         type="text"
         id="image_url"
         name="image_url"
         value="{{ post.image_url or '' }}"
-        placeholder="image.jpg"
+        placeholder="https://example.com/image.jpg"
+        class="image-input"
+        {% if not post.image_url %}style="display: none;"{% endif %}
       />
+      <small
+        >Upload a new image, provide a URL, or keep the current image</small
+      >
     </div>
 
     <div class="form-actions">
       <button type="submit" class="btn-primary">Update Post</button>
-      <a href="/post/{{ post.id }}" class="btn-secondary">Cancel</a>
+      <a href="/blog/{{ post.id }}" class="btn-secondary">Cancel</a>
     </div>
   </form>
 </div>
@@ -93,6 +157,26 @@ block content %}
 
     // Focus back on input
     tagsInput.focus();
+  }
+
+  function toggleImageInput() {
+    const fileInput = document.getElementById("image_file");
+    const urlInput = document.getElementById("image_url");
+    const selectedOption = document.querySelector(
+      'input[name="image_option"]:checked'
+    ).value;
+
+    if (selectedOption === "file") {
+      fileInput.style.display = "block";
+      urlInput.style.display = "none";
+    } else if (selectedOption === "url") {
+      fileInput.style.display = "none";
+      urlInput.style.display = "block";
+    } else {
+      // keep current
+      fileInput.style.display = "none";
+      urlInput.style.display = "none";
+    }
   }
 </script>
 {% endblock %}

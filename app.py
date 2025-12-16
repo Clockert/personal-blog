@@ -1,9 +1,11 @@
 # Import Flask, render_template, and database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment, get_posts_count
+from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import uuid
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,6 +15,28 @@ app = Flask(__name__)
 
 # Set secret key for sessions (needed for login)
 app.secret_key = os.getenv('SECRET_KEY')
+
+# Configure upload folder and allowed extensions
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_uploaded_file(file):
+    """Save uploaded file with unique filename and return the path"""
+    if file and allowed_file(file.filename):
+        # Generate unique filename to avoid conflicts
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file.save(filepath)
+        # Return relative path for database storage
+        return f"/static/uploads/{unique_filename}"
+    return None
 
 # Custom Jinja2 filter for Norwegian date format
 @app.template_filter('norwegian_date')
@@ -83,7 +107,7 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 # Individual post route
-@app.route('/post/<int:post_id>', methods=['GET', 'POST'])
+@app.route('/blog/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
     post = get_post_by_id(post_id)
     if post is None:
@@ -138,7 +162,7 @@ def logout():
     return redirect(url_for('home'))
 
 # Create new post route (GET shows form, POST saves post)
-@app.route('/post/new', methods=['GET', 'POST'])
+@app.route('/blog/new', methods=['GET', 'POST'])
 def new_post():
     # Check if user is logged in
     if not session.get('logged_in'):
@@ -151,15 +175,28 @@ def new_post():
         content = request.form['content']
         excerpt = request.form['excerpt']
         tags = request.form.get('tags', '')  # Optional field
-        image_url = request.form.get('image_url', None)  # Optional field
-        
+
+        # Handle image upload or URL
+        image_url = None
+        if 'image_file' in request.files:
+            file = request.files['image_file']
+            if file and file.filename:
+                # User uploaded a file
+                image_url = save_uploaded_file(file)
+                if not image_url:
+                    flash('Invalid image file type. Allowed: PNG, JPG, JPEG, GIF, WEBP', 'error')
+
+        # If no file uploaded, check for URL
+        if not image_url:
+            image_url = request.form.get('image_url', None)
+
         # Get current date
         from datetime import datetime
         date = datetime.now().strftime('%Y-%m-%d')
-        
+
         # Insert into database
         create_post(title, date, content, excerpt, image_url, tags)
-        
+
         flash('Post created successfully!', 'success')
         return redirect(url_for('home'))
     
@@ -168,7 +205,7 @@ def new_post():
     return render_template('new_post.html', existing_tags=existing_tags)
 
 # Edit post route
-@app.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
+@app.route('/blog/<int:post_id>/edit', methods=['GET', 'POST'])
 def edit_post(post_id):
     # Check if user is logged in
     if not session.get('logged_in'):
@@ -185,14 +222,31 @@ def edit_post(post_id):
         content = request.form['content']
         excerpt = request.form['excerpt']
         tags = request.form.get('tags', '')
-        image_url = request.form.get('image_url', None)
-        
+
+        # Handle image upload or URL
+        image_option = request.form.get('image_option', 'keep')
+        image_url = post['image_url']  # Default to current image
+
+        if image_option == 'file' and 'image_file' in request.files:
+            file = request.files['image_file']
+            if file and file.filename:
+                # User uploaded a new file
+                new_image_url = save_uploaded_file(file)
+                if new_image_url:
+                    image_url = new_image_url
+                else:
+                    flash('Invalid image file type. Allowed: PNG, JPG, JPEG, GIF, WEBP', 'error')
+        elif image_option == 'url':
+            # User wants to use a URL
+            image_url = request.form.get('image_url', None)
+        # If 'keep', image_url already has the current value
+
         # Keep the original date
         date = post['date']
-        
+
         # Update in database
         update_post(post_id, title, date, content, excerpt, image_url, tags)
-        
+
         flash('Post updated successfully!', 'success')
         return redirect(url_for('post', post_id=post_id))
     
@@ -201,7 +255,7 @@ def edit_post(post_id):
     return render_template('edit_post.html', post=post, existing_tags=existing_tags)
 
 # Delete post route
-@app.route('/post/<int:post_id>/delete', methods=['POST'])
+@app.route('/blog/<int:post_id>/delete', methods=['POST'])
 def delete_post_route(post_id):
     # Check if user is logged in
     if not session.get('logged_in'):

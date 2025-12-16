@@ -3,7 +3,7 @@ block content %}
 <div class="form-container">
   <h2>Create New Post</h2>
 
-  <form method="POST" action="/post/new" class="post-form">
+  <form method="POST" action="/blog/new" class="post-form" enctype="multipart/form-data">
     <div class="form-group">
       <label for="title">Title *</label>
       <input type="text" id="title" name="title" required />
@@ -50,18 +50,38 @@ block content %}
     </div>
 
     <div class="form-group">
-      <label for="image_url">Image URL (optional)</label>
+      <label>Image (optional)</label>
+      <div class="image-upload-options">
+        <div class="upload-option">
+          <input type="radio" id="upload-file" name="image_option" value="file" checked onchange="toggleImageInput()">
+          <label for="upload-file">Upload Image</label>
+        </div>
+        <div class="upload-option">
+          <input type="radio" id="upload-url" name="image_option" value="url" onchange="toggleImageInput()">
+          <label for="upload-url">Image URL</label>
+        </div>
+      </div>
+
+      <input
+        type="file"
+        id="image_file"
+        name="image_file"
+        accept="image/*"
+        style="margin-top: 0.5rem;"
+      />
       <input
         type="text"
         id="image_url"
         name="image_url"
-        placeholder="image.jpg"
+        placeholder="https://example.com/image.jpg"
+        style="margin-top: 0.5rem; display: none;"
       />
+      <small>Upload an image or provide a URL</small>
     </div>
 
     <div class="form-actions">
       <button type="submit" class="btn-primary">Publish Post</button>
-      <a href="/" class="btn-secondary">Cancel</a>
+      <a href="/blog" class="btn-secondary">Cancel</a>
     </div>
   </form>
 </div>
@@ -81,6 +101,22 @@ block content %}
 
     // Focus back on input
     tagsInput.focus();
+  }
+
+  function toggleImageInput() {
+    const fileInput = document.getElementById("image_file");
+    const urlInput = document.getElementById("image_url");
+    const selectedOption = document.querySelector('input[name="image_option"]:checked').value;
+
+    if (selectedOption === "file") {
+      fileInput.style.display = "block";
+      urlInput.style.display = "none";
+      urlInput.value = "";
+    } else {
+      fileInput.style.display = "none";
+      urlInput.style.display = "block";
+      fileInput.value = "";
+    }
   }
 </script>
 {% endblock %}
