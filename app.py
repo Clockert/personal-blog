@@ -9,6 +9,23 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 import uuid
 
+# =============================================================================
+# Table of Contents
+# 1. Configuration and Setup
+# 2. Template Filters
+# 3. File Upload Helpers
+# 4. Authentication Configuration
+# 5. Public Routes
+# 6. Authentication Routes
+# 7. Post Management Routes
+# 8. Comment Management Routes
+# 9. Tag Filtering Routes
+# 10. Application Entry Point
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Configuration and Setup
+# -----------------------------------------------------------------------------
 # Load environment variables from .env file
 load_dotenv()
 
@@ -25,6 +42,10 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+
+# -----------------------------------------------------------------------------
+# 2. Template Filters
+# -----------------------------------------------------------------------------
 
 # Custom Jinja2 filter for Norwegian date format
 @app.template_filter('norwegian_date')
@@ -50,7 +71,10 @@ def norwegian_date_filter(date_string):
         # If parsing fails, return original string
         return date_string
 
-# Helper functions for file uploads
+# -----------------------------------------------------------------------------
+# 3. File Upload Helpers
+# -----------------------------------------------------------------------------
+
 def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -73,10 +97,16 @@ def save_uploaded_file(file):
         return f"/static/uploads/{unique_filename}"
     return None
 
+# -----------------------------------------------------------------------------
+# 4. Authentication Configuration
+# -----------------------------------------------------------------------------
 # Get admin credentials from environment
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
 ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH')  # Store hashed password in .env
 
+# -----------------------------------------------------------------------------
+# 5. Public Routes
+# -----------------------------------------------------------------------------
 # Landing page route
 @app.route('/')
 def home():
@@ -130,6 +160,10 @@ def about():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+# -----------------------------------------------------------------------------
+# 6. Authentication Routes
+# -----------------------------------------------------------------------------
 
 # Individual blog post route
 @app.route('/blog/<int:post_id>', methods=['GET', 'POST'])
@@ -189,6 +223,10 @@ def logout():
     session.pop('username', None)
     flash('You have been logged out', 'success')
     return redirect(url_for('home'))
+
+# -----------------------------------------------------------------------------
+# 7. Post Management Routes
+# -----------------------------------------------------------------------------
 
 # Create new post route (GET shows form, POST saves post)
 @app.route('/blog/new', methods=['GET', 'POST'])
@@ -384,6 +422,10 @@ def delete_post_route(post_id):
     flash('Post deleted successfully!', 'success')
     return redirect(url_for('blog'))
 
+# -----------------------------------------------------------------------------
+# 8. Comment Management Routes
+# -----------------------------------------------------------------------------
+
 # Delete comment route
 @app.route('/comment/<int:comment_id>/delete', methods=['POST'])
 def delete_comment_route(comment_id):
@@ -399,6 +441,9 @@ def delete_comment_route(comment_id):
     # Redirect back to the post page
     return redirect(request.referrer or url_for('home'))
 
+# -----------------------------------------------------------------------------
+# 9. Tag Filtering Routes
+# -----------------------------------------------------------------------------
 
 # Tag filter route
 @app.route('/tag/<tag_name>')
@@ -406,8 +451,10 @@ def filter_by_tag(tag_name):
     posts = get_posts_by_tag(tag_name)
     return render_template('tag_filter.html', posts=posts, tag=tag_name)
 
-
-
+# -----------------------------------------------------------------------------
+# 10. Application Entry Point
+# -----------------------------------------------------------------------------
 # Run the application
 if __name__ == '__main__':
+    # If you run this file directly, start the Flask development server
     app.run(debug=True)
