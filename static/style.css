@@ -545,6 +545,59 @@ a.tag {
   margin-top: 0.5rem;
 }
 
+/* Sort Dropdown */
+.sort-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.sort-dropdown label {
+  font-weight: 500;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.sort-dropdown select {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sort-dropdown select:hover {
+  border-color: var(--color-accent);
+}
+
+.sort-dropdown select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(138, 62, 170, 0.08);
+}
+
+/* Browse by Tags Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tag-browse {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.8rem;
+}
+
 /* ===========================
    14. Create Post Form
    =========================== */
@@ -612,6 +665,49 @@ a.tag {
 
 .btn-secondary:hover {
   background: #e5e5e8;
+}
+
+/* Tag Suggestions in Forms */
+.existing-tags {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.existing-tags small {
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tag-suggestion {
+  background: linear-gradient(
+    135deg,
+    rgba(138, 62, 170, 0.08),
+    rgba(113, 7, 98, 0.08)
+  );
+  color: var(--color-accent);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  border: 1px solid rgba(138, 62, 170, 0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-suggestion:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(138, 62, 170, 0.15),
+    rgba(113, 7, 98, 0.15)
+  );
+  transform: translateY(-1px);
 }
 
 /* ===========================
@@ -689,6 +785,27 @@ a.tag {
 
 .btn-icon .material-symbols-outlined {
   font-size: 20px;
+}
+
+/* New Post Button */
+.btn-new-post {
+  background: linear-gradient(
+    135deg,
+    var(--header-bg-start),
+    var(--header-bg-end)
+  );
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-new-post:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ===========================
