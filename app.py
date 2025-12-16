@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 import uuid
 
 # Load environment variables from .env file
@@ -74,7 +75,7 @@ def save_uploaded_file(file):
 
 # Get admin credentials from environment
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
+ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH')  # Store hashed password in .env
 
 # Landing page route
 @app.route('/')
@@ -166,9 +167,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        # Check credentials
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+
+        # Check credentials - use password hashing for security
+        if username == ADMIN_USERNAME and check_password_hash(ADMIN_PASSWORD_HASH, password):
             # Login successful - store in session
             session['logged_in'] = True
             session['username'] = username

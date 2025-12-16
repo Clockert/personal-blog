@@ -19,20 +19,25 @@ def client():
     """Set up Flask test client"""
     # Use test database
     database.DATABASE = TEST_DATABASE
-    
+
     # Set up test config
     app.config['TESTING'] = True
     app.config['SECRET_KEY'] = 'test-secret-key'
-    
+
+    # Set test credentials with hashed password
+    # Hash of 'password123' for testing
+    os.environ['ADMIN_USERNAME'] = 'admin'
+    os.environ['ADMIN_PASSWORD_HASH'] = 'pbkdf2:sha256:1000000$933xnSwzgy0cer7z$017aa78b91a809820ff2920c2d3103257e4dfec692b04cd897a4246ac457dd49'
+
     # Initialize test database
     database.init_db()
-    
+
     # Add a test post
     database.create_post('Test Post', '2025-12-15', 'Test content for testing', 'Test excerpt', None, 'test, flask')
-    
+
     with app.test_client() as client:
         yield client
-    
+
     # Clean up
     if os.path.exists(TEST_DATABASE):
         os.remove(TEST_DATABASE)

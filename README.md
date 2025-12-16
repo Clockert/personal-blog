@@ -153,6 +153,11 @@ Building this incrementally, starting simple and adding features step by step.
 
 ### Security & Authentication
 
+- **Password hashing**: Passwords secured using PBKDF2-SHA256 with 1,000,000 iterations
+  - Never stores plaintext passwords
+  - Uses `werkzeug.security` for industry-standard hashing
+  - Includes random salt to prevent rainbow table attacks
+  - Generate new hashes with: `python generate_password_hash.py`
 - **Server-side validation**: All inputs validated to prevent data corruption and DoS attacks
 - **Protected routes**: Admin-only access for creating, editing, and deleting content
 - **Session management**: Flask sessions for secure login state
@@ -167,12 +172,12 @@ personal-blog/
 ├── app.py                 # Main Flask application
 ├── database.py            # Database functions
 ├── validation.py          # Input validation functions
+├── generate_password_hash.py  # Password hash generator utility
 ├── schema.sql             # Database schema
 ├── blog.db               # SQLite database
 ├── .env                  # Environment variables (not in git)
 ├── requirements.txt      # Python dependencies
 ├── SECURITY.md           # Security policy and guidelines
-├── VALIDATION_IMPLEMENTATION.md  # Validation documentation
 ├── templates/
 │   ├── base.html        # Base template with header/footer
 │   ├── home.html        # Home page with posts list
@@ -234,7 +239,19 @@ Visit `http://localhost:5000`
 
 ### Login Credentials
 
-Set these in your `.env` file (see `.env.example`)
+Create a `.env` file with:
+```bash
+SECRET_KEY=your-secret-key-here
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=your-hashed-password-here
+```
+
+**To generate a password hash:**
+```bash
+python generate_password_hash.py
+# Enter your password when prompted
+# Copy the hash to your .env file
+```
 
 ## Testing
 
@@ -278,6 +295,7 @@ pytest --cov=. --cov-report=html
 
 **Features:**
 
+- ✅ **Password hashing** with PBKDF2-SHA256 (industry-standard security)
 - ✅ **Server-side input validation** with comprehensive security checks
 - ✅ Full CRUD operations (Create, Read, Update, Delete) for posts
 - ✅ Intelligent image management with automatic cleanup on delete/replace
