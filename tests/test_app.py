@@ -147,3 +147,118 @@ def test_edit_post_requires_login(client):
     """Test that editing post requires login"""
     response = client.get('/blog/1/edit', follow_redirects=True)
     assert b'Please log in' in response.data
+
+def test_about_page(client):
+    """Test that about page loads"""
+    response = client.get('/about')
+    assert response.status_code == 200
+
+def test_blog_pagination(client):
+    """Test blog pagination"""
+    # Create multiple posts
+    with client.session_transaction() as session:
+        session['logged_in'] = True
+        session['username'] = 'admin'
+
+    for i in range(8):
+        database.create_post(f'Post {i}', '2025-12-15', 'Content', 'Excerpt', None, 'test')
+
+    # Test page 1
+    response = client.get('/blog?page=1')
+    assert response.status_code == 200
+
+    # Test page 2
+    response = client.get('/blog?page=2')
+    assert response.status_code == 200
+
+def test_blog_sorting(client):
+    """Test blog sorting by date"""
+    # Test default sort (date_desc)
+    response = client.get('/blog')
+    assert response.status_code == 200
+
+    # Test explicit sort parameter
+    response = client.get('/blog?sort=date_desc')
+    assert response.status_code == 200
+
+def test_edit_post_functionality(client):
+    """Test actually editing a post when logged in"""
+    # Login first
+    with client.session_transaction() as session:
+        session['logged_in'] = True
+        session['username'] = 'admin'
+
+    # Edit the post
+    response = client.post('/blog/1/edit', data={
+        'title': 'Updated Title',
+        'content': 'Updated content',
+        'excerpt': 'Updated excerpt',
+        'tags': 'updated, test',
+        'image_option': 'keep'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Post updated successfully' in response.data
+    assert b'Updated Title' in response.data
+
+def test_delete_post_functionality(client):
+    """Test actually deleting a post when logged in"""
+    # Login first
+    with client.session_transaction() as session:
+        session['logged_in'] = True
+        session['username'] = 'admin'
+
+    # Delete the post
+    response = client.post('/blog/1/delete', follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Post deleted successfully' in response.data
+
+    # Verify post is gone
+    response = client.get('/blog/1')
+    assert response.status_code == 404
+
+def test_delete_comment_requires_login(client):
+    """Test that deleting comment requires login"""
+    # First add a comment
+    client.post('/blog/1', data={
+        'author': 'Test User',
+        'comment_text': 'Test comment'
+    })
+
+    # Try to delete without login
+    response = client.post('/comment/1/delete', follow_redirects=True)
+    assert b'Please log in' in response.data
+
+def test_delete_comment_functionality(client):
+    """Test actually deleting a comment when logged in"""
+    # Add a comment first
+    client.post('/blog/1', data={
+        'author': 'Test User',
+        'comment_text': 'Test comment to delete'
+    })
+
+    # Login
+    with client.session_transaction() as session:
+        session['logged_in'] = True
+        session['username'] = 'admin'
+
+    # Delete the comment
+    response = client.post('/comment/1/delete', follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Comment deleted successfully' in response.data
+
+def test_norwegian_date_filter(client):
+    """Test Norwegian date filter formatting"""
+    from app import norwegian_date_filter
+
+    # Test valid date
+    result = norwegian_date_filter('2025-12-15')
+    assert '15' in result
+    assert 'des' in result
+    assert '2025' in result
+
+    # Test invalid date returns original
+    result = norwegian_date_filter('invalid-date')
+    assert result == 'invalid-date'

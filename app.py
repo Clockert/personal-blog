@@ -401,7 +401,7 @@ def delete_post_route(post_id):
 
     # Get the post to check for uploaded image
     post = get_post_by_id(post_id)
-    if post and post.get('image_url'):
+    if post and post['image_url']:
         # Check if it's an uploaded file (starts with /static/uploads/)
         if post['image_url'].startswith('/static/uploads/'):
             # Extract filename and delete the file

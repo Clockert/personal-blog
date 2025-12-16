@@ -160,3 +160,77 @@ def test_get_posts_by_tag(test_db):
     # Filter by 'testing' tag
     testing_posts = get_posts_by_tag('testing')
     assert len(testing_posts) == 1
+
+def test_delete_comment(test_db):
+    """Test deleting a comment"""
+    # Create a post and comment
+    create_post('Post with Comment', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+    create_comment(1, 'Alice', 'Comment to delete', '2024-12-15 10:00')
+    create_comment(1, 'Bob', 'Keep this comment', '2024-12-15 11:00')
+
+    # Verify we have 2 comments
+    comments = get_comments_for_post(1)
+    assert len(comments) == 2
+
+    # Delete one comment (Alice's comment with ID 1)
+    from database import delete_comment
+    delete_comment(1)
+
+    # Verify only one comment remains (Bob's comment)
+    comments = get_comments_for_post(1)
+    assert len(comments) == 1
+    assert comments[0]['author'] == 'Bob'
+
+def test_get_posts_count(test_db):
+    """Test getting total count of posts"""
+    from database import get_posts_count
+
+    # Initially no posts
+    count = get_posts_count()
+    assert count == 0
+
+    # Create some posts
+    create_post('Post 1', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+    create_post('Post 2', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+    create_post('Post 3', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+
+    # Count should be 3
+    count = get_posts_count()
+    assert count == 3
+
+    # Delete one post
+    delete_post(1)
+
+    # Count should be 2
+    count = get_posts_count()
+    assert count == 2
+
+def test_post_sorting(test_db):
+    """Test that posts are sorted correctly by date"""
+    # Create posts with different dates
+    create_post('Oldest Post', '2024-12-10', 'Content', 'Excerpt', None, 'test')
+    create_post('Newest Post', '2024-12-20', 'Content', 'Excerpt', None, 'test')
+    create_post('Middle Post', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+
+    # Get posts sorted by date descending (newest first)
+    posts = get_all_posts(sort_by='date_desc')
+    assert posts[0]['title'] == 'Newest Post'
+    assert posts[1]['title'] == 'Middle Post'
+    assert posts[2]['title'] == 'Oldest Post'
+
+def test_pagination_limit_and_offset(test_db):
+    """Test pagination with limit and offset"""
+    # Create 10 posts
+    for i in range(10):
+        create_post(f'Post {i}', '2024-12-15', 'Content', 'Excerpt', None, 'test')
+
+    # Get first 5 posts
+    first_page = get_all_posts(limit=5, offset=0)
+    assert len(first_page) == 5
+
+    # Get next 5 posts
+    second_page = get_all_posts(limit=5, offset=5)
+    assert len(second_page) == 5
+
+    # Verify they're different posts
+    assert first_page[0]['id'] != second_page[0]['id']
