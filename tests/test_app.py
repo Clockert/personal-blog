@@ -41,19 +41,19 @@ def test_home_page(client):
     """Test that home page loads and shows posts"""
     response = client.get('/')
     assert response.status_code == 200
-    assert b'Recent Posts' in response.data
+    assert b'Welcome to My Blog' in response.data
     assert b'Test Post' in response.data
 
 def test_individual_post_page(client):
     """Test that individual post page loads"""
-    response = client.get('/post/1')
+    response = client.get('/blog/1')
     assert response.status_code == 200
     assert b'Test Post' in response.data
     assert b'Test content for testing' in response.data
 
 def test_post_not_found(client):
     """Test 404 for non-existent post"""
-    response = client.get('/post/999')
+    response = client.get('/blog/999')
     assert response.status_code == 404
 
 def test_login_page_loads(client):
@@ -93,7 +93,7 @@ def test_logout(client):
 
 def test_create_post_requires_login(client):
     """Test that creating post requires login"""
-    response = client.get('/post/new', follow_redirects=True)
+    response = client.get('/blog/new', follow_redirects=True)
     assert b'Please log in' in response.data
 
 def test_create_post_when_logged_in(client):
@@ -104,7 +104,7 @@ def test_create_post_when_logged_in(client):
         session['username'] = 'admin'
     
     # Create post
-    response = client.post('/post/new', data={
+    response = client.post('/blog/new', data={
         'title': 'New Test Post',
         'content': 'This is new content',
         'excerpt': 'New excerpt',
@@ -116,7 +116,7 @@ def test_create_post_when_logged_in(client):
 
 def test_add_comment(client):
     """Test adding a comment to a post"""
-    response = client.post('/post/1', data={
+    response = client.post('/blog/1', data={
         'author': 'Test User',
         'comment_text': 'This is a test comment'
     }, follow_redirects=True)
@@ -135,10 +135,10 @@ def test_tag_filtering(client):
 
 def test_delete_post_requires_login(client):
     """Test that deleting post requires login"""
-    response = client.post('/post/1/delete', follow_redirects=True)
+    response = client.post('/blog/1/delete', follow_redirects=True)
     assert b'Please log in' in response.data
 
 def test_edit_post_requires_login(client):
     """Test that editing post requires login"""
-    response = client.get('/post/1/edit', follow_redirects=True)
+    response = client.get('/blog/1/edit', follow_redirects=True)
     assert b'Please log in' in response.data

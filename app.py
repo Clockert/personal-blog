@@ -1,6 +1,7 @@
 # Import Flask, render_template, and database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment, get_posts_count
+from validation import validate_post_data, validate_comment_data, validate_image_url, validate_pagination_params, sanitize_tags
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -93,6 +94,11 @@ def blog():
     # Get page parameter from query string, default to 1
     page = request.args.get('page', 1, type=int)
 
+    # Validate pagination parameters
+    is_valid, error_msg, page = validate_pagination_params(page)
+    if not is_valid:
+        flash(error_msg, 'error')
+
     # Set posts per page
     per_page = 6
 
@@ -137,14 +143,17 @@ def blog_post(post_id):
         author = request.form.get('author', 'Anonymous')
         comment_text = request.form.get('comment_text')
 
-        if comment_text:
+        # Validate comment data
+        is_valid, error_msg = validate_comment_data(comment_text, author)
+
+        if is_valid:
             from datetime import datetime
             date = datetime.now().strftime('%Y-%m-%d %H:%M')
             create_comment(post_id, author, comment_text, date)
             flash('Comment added successfully!', 'success')
             return redirect(url_for('blog_post', post_id=post_id))
         else:
-            flash('Comment cannot be empty', 'error')
+            flash(error_msg, 'error')
 
     # Get comments for this post
     comments = get_comments_for_post(post_id)
@@ -191,10 +200,20 @@ def new_post():
 
     if request.method == 'POST':
         # Get form data
-        title = request.form['title']
-        content = request.form['content']
-        excerpt = request.form['excerpt']
-        tags = request.form.get('tags', '')  # Optional field
+        title = request.form.get('title', '').strip()
+        content = request.form.get('content', '').strip()
+        excerpt = request.form.get('excerpt', '').strip()
+        tags = request.form.get('tags', '')
+
+        # Validate post data
+        is_valid, error_msg = validate_post_data(title, content, excerpt, tags)
+
+        if not is_valid:
+            flash(error_msg, 'error')
+            return render_template('new_post.html', existing_tags=get_all_tags())
+
+        # Sanitize tags
+        tags = sanitize_tags(tags)
 
         # Handle image - either upload or URL
         image_url = None
@@ -208,10 +227,17 @@ def new_post():
                     image_url = save_uploaded_file(file)
                     if image_url is None:
                         flash('Invalid file type. Please upload a valid image (PNG, JPG, GIF, WebP).', 'error')
+                        return render_template('new_post.html', existing_tags=get_all_tags())
         elif image_option == 'url':
             # Handle URL
-            image_url = request.form.get('image_url', None)
-            if image_url and image_url.strip() == '':
+            image_url = request.form.get('image_url', '').strip()
+            if image_url:
+                # Validate image URL
+                is_valid_url, url_error_msg = validate_image_url(image_url)
+                if not is_valid_url:
+                    flash(url_error_msg, 'error')
+                    return render_template('new_post.html', existing_tags=get_all_tags())
+            else:
                 image_url = None
 
         # Get current date
@@ -243,10 +269,20 @@ def edit_post(post_id):
 
     if request.method == 'POST':
         # Get form data
-        title = request.form['title']
-        content = request.form['content']
-        excerpt = request.form['excerpt']
+        title = request.form.get('title', '').strip()
+        content = request.form.get('content', '').strip()
+        excerpt = request.form.get('excerpt', '').strip()
         tags = request.form.get('tags', '')
+
+        # Validate post data
+        is_valid, error_msg = validate_post_data(title, content, excerpt, tags)
+
+        if not is_valid:
+            flash(error_msg, 'error')
+            return render_template('edit_post.html', post=post, existing_tags=get_all_tags())
+
+        # Sanitize tags
+        tags = sanitize_tags(tags)
 
         # Handle image - either upload, URL, or keep existing
         old_image_url = post['image_url']  # Save old image URL for cleanup
@@ -272,20 +308,36 @@ def edit_post(post_id):
                                     print(f"Error deleting old image: {e}")
                     else:
                         flash('Invalid file type. Please upload a valid image (PNG, JPG, GIF, WebP).', 'error')
+                        return render_template('edit_post.html', post=post, existing_tags=get_all_tags())
         elif image_option == 'url':
             # Handle URL
-            image_url = request.form.get('image_url', None)
-            if image_url and image_url.strip() == '':
+            image_url = request.form.get('image_url', '').strip()
+            if image_url:
+                # Validate image URL
+                is_valid_url, url_error_msg = validate_image_url(image_url)
+                if not is_valid_url:
+                    flash(url_error_msg, 'error')
+                    return render_template('edit_post.html', post=post, existing_tags=get_all_tags())
+                # Delete old uploaded image if switching to URL
+                if image_url != old_image_url and old_image_url and old_image_url.startswith('/static/uploads/'):
+                    old_filename = old_image_url.split('/')[-1]
+                    old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                    if os.path.exists(old_filepath):
+                        try:
+                            os.remove(old_filepath)
+                        except Exception as e:
+                            print(f"Error deleting old image: {e}")
+            else:
                 image_url = None
-            # Delete old uploaded image if switching to URL
-            if image_url != old_image_url and old_image_url and old_image_url.startswith('/static/uploads/'):
-                old_filename = old_image_url.split('/')[-1]
-                old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
-                if os.path.exists(old_filepath):
-                    try:
-                        os.remove(old_filepath)
-                    except Exception as e:
-                        print(f"Error deleting old image: {e}")
+                # Delete old uploaded image if removing image
+                if old_image_url and old_image_url.startswith('/static/uploads/'):
+                    old_filename = old_image_url.split('/')[-1]
+                    old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                    if os.path.exists(old_filepath):
+                        try:
+                            os.remove(old_filepath)
+                        except Exception as e:
+                            print(f"Error deleting old image: {e}")
         # If image_option == 'keep', image_url stays as post['image_url']
 
         # Keep the original date

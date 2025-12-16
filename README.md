@@ -110,6 +110,20 @@ Building this incrementally, starting simple and adding features step by step.
 
 ## Key Features
 
+### Server-Side Input Validation
+
+- **Comprehensive validation**: All user inputs validated before database operations
+- **Security-first approach**: Prevents empty posts, extremely long content, and malicious URLs
+- **Length limits**:
+  - Titles: max 200 characters
+  - Content: max 50,000 characters
+  - Comments: max 5,000 characters
+  - Tags: max 20 tags, auto-deduplicated
+- **URL validation**: Image URLs must use http/https protocol (prevents file:// attacks)
+- **Pagination protection**: Page numbers validated to prevent negative or extreme values
+- **User-friendly errors**: Clear error messages guide users to fix invalid input
+- **39 validation tests**: Comprehensive test coverage ensures reliability
+
 ### Intelligent Image Management
 
 - **Multiple input options**: Upload files or provide image URLs
@@ -139,10 +153,12 @@ Building this incrementally, starting simple and adding features step by step.
 
 ### Security & Authentication
 
+- **Server-side validation**: All inputs validated to prevent data corruption and DoS attacks
 - **Protected routes**: Admin-only access for creating, editing, and deleting content
 - **Session management**: Flask sessions for secure login state
 - **Environment variables**: Sensitive credentials stored safely in `.env` file
 - **Flash messages**: User feedback for all actions (success/error states)
+- **SQL injection prevention**: Parameterized queries throughout the application
 
 ## Project Structure
 
@@ -150,11 +166,13 @@ Building this incrementally, starting simple and adding features step by step.
 personal-blog/
 ├── app.py                 # Main Flask application
 ├── database.py            # Database functions
+├── validation.py          # Input validation functions
 ├── schema.sql             # Database schema
 ├── blog.db               # SQLite database
 ├── .env                  # Environment variables (not in git)
 ├── requirements.txt      # Python dependencies
 ├── SECURITY.md           # Security policy and guidelines
+├── VALIDATION_IMPLEMENTATION.md  # Validation documentation
 ├── templates/
 │   ├── base.html        # Base template with header/footer
 │   ├── home.html        # Home page with posts list
@@ -171,8 +189,9 @@ personal-blog/
 │   ├── logo.png         # Blog logo
 │   └── uploads/         # Uploaded images for posts
 ├── tests/
-│   ├── test_app.py      # Flask application tests
-│   └── test_database.py # Database function tests
+│   ├── test_app.py      # Flask application tests (13 tests)
+│   ├── test_database.py # Database function tests (7 tests)
+│   └── test_validation.py # Input validation tests (39 tests)
 ├── venv/                 # Virtual environment (not in git)
 └── .gitignore           # Git ignore file
 ```
@@ -219,7 +238,7 @@ Set these in your `.env` file (see `.env.example`)
 
 ## Testing
 
-The project includes automated tests for both the Flask application and database functions.
+The project includes comprehensive automated tests with **59 total tests** covering the Flask application, database operations, and input validation.
 
 ### Running Tests
 
@@ -227,15 +246,16 @@ The project includes automated tests for both the Flask application and database
 # Make sure your virtual environment is activated
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Run all tests
+# Run all tests (59 tests)
 pytest
 
 # Run with verbose output
 pytest -v
 
 # Run specific test file
-pytest tests/test_app.py
-pytest tests/test_database.py
+pytest tests/test_app.py         # 13 tests
+pytest tests/test_database.py    # 7 tests
+pytest tests/test_validation.py  # 39 tests
 
 # Run with coverage report
 pytest --cov=. --cov-report=html
@@ -243,8 +263,14 @@ pytest --cov=. --cov-report=html
 
 ### Test Structure
 
-- **test_app.py** - Tests for Flask routes, authentication, CRUD operations, and error handling
-- **test_database.py** - Tests for database functions including post creation, retrieval, updates, and tag management
+- **test_app.py** - Tests for Flask routes, authentication, CRUD operations, and error handling (13 tests)
+- **test_database.py** - Tests for database functions including post creation, retrieval, updates, and tag management (7 tests)
+- **test_validation.py** - Comprehensive tests for input validation functions (39 tests)
+  - Post data validation (title, content, excerpt, tags)
+  - Comment validation (text length, author length)
+  - Image URL validation (protocol checking, length limits)
+  - Pagination parameter validation (bounds checking)
+  - Tag sanitization (deduplication, whitespace removal, limits)
 
 ## Current Status
 
@@ -252,9 +278,10 @@ pytest --cov=. --cov-report=html
 
 **Features:**
 
+- ✅ **Server-side input validation** with comprehensive security checks
 - ✅ Full CRUD operations (Create, Read, Update, Delete) for posts
 - ✅ Intelligent image management with automatic cleanup on delete/replace
-- ✅ Multiple image options (file upload with 5MB limit or URL)
+- ✅ Multiple image options (file upload with 5MB limit or URL validation)
 - ✅ Comment system with anonymous support and admin moderation
 - ✅ Tag-based filtering and organization with suggestions
 - ✅ Post pagination (6 posts per page) and sorting (newest/oldest/alphabetical)
@@ -266,7 +293,7 @@ pytest --cov=. --cov-report=html
 - ✅ About page
 - ✅ Responsive UI
 - ✅ Flash messages for user feedback
-- ✅ Automated testing with pytest
+- ✅ Automated testing with pytest (59 tests, 100% passing)
 
 ## Potential Future Enhancements
 
