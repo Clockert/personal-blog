@@ -1,6 +1,6 @@
 # Import Flask, render_template, and database functions
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment
+from database import get_all_posts, get_post_by_id, create_post, update_post, delete_post, get_posts_by_tag, get_all_tags, get_comments_for_post, create_comment, delete_comment, get_posts_count
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -47,9 +47,30 @@ ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 def home():
     # Get sort parameter from query string, default to 'date_desc'
     sort_by = request.args.get('sort', 'date_desc')
-    posts = get_all_posts(sort_by)
+
+    # Get page parameter from query string, default to 1
+    page = request.args.get('page', 1, type=int)
+
+    # Set posts per page
+    per_page = 6
+
+    # Calculate offset
+    offset = (page - 1) * per_page
+
+    # Get paginated posts
+    posts = get_all_posts(sort_by, limit=per_page, offset=offset)
+
+    # Get total count for pagination
+    total_posts = get_posts_count()
+    total_pages = (total_posts + per_page - 1) // per_page  # Ceiling division
+
     tags = get_all_tags()
-    return render_template('home.html', posts=posts, tags=tags, current_sort=sort_by)
+    return render_template('home.html',
+                         posts=posts,
+                         tags=tags,
+                         current_sort=sort_by,
+                         page=page,
+                         total_pages=total_pages)
 
 # About page route
 @app.route('/about')

@@ -19,11 +19,13 @@ def init_db():
     conn.close()
     print("Database initialized!")
 
-def get_all_posts(sort_by='date_desc'):
-    """Get all posts from the database with various sorting options
+def get_all_posts(sort_by='date_desc', limit=None, offset=0):
+    """Get all posts from the database with various sorting options and pagination
 
     Args:
         sort_by: Sort order - 'date_desc', 'date_asc', 'title_asc', 'title_desc'
+        limit: Maximum number of posts to return (None for all posts)
+        offset: Number of posts to skip (for pagination)
     """
     conn = get_db_connection()
 
@@ -37,9 +39,21 @@ def get_all_posts(sort_by='date_desc'):
     else:  # default to date_desc
         order_clause = 'ORDER BY date DESC'
 
-    posts = conn.execute(f'SELECT * FROM posts {order_clause}').fetchall()
+    # Add LIMIT and OFFSET if specified
+    query = f'SELECT * FROM posts {order_clause}'
+    if limit is not None:
+        query += f' LIMIT {limit} OFFSET {offset}'
+
+    posts = conn.execute(query).fetchall()
     conn.close()
     return posts
+
+def get_posts_count():
+    """Get the total count of posts in the database"""
+    conn = get_db_connection()
+    count = conn.execute('SELECT COUNT(*) FROM posts').fetchone()[0]
+    conn.close()
+    return count
 
 def get_post_by_id(post_id):
     """Get a single post by its ID"""
