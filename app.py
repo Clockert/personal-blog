@@ -182,7 +182,6 @@ def blog_post(post_id):
         is_valid, error_msg = validate_comment_data(comment_text, author)
 
         if is_valid:
-            from datetime import datetime
             date = datetime.now().strftime('%Y-%m-%d %H:%M')
             create_comment(post_id, author, comment_text, date)
             flash('Comment added successfully!', 'success')
@@ -280,7 +279,6 @@ def new_post():
                 image_url = None
 
         # Get current date
-        from datetime import datetime
         date = datetime.now().strftime('%Y-%m-%d')
 
         # Insert into database
