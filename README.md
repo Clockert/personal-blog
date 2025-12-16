@@ -7,12 +7,14 @@ A blogging application I'm building for my Backend Essentials course project. Le
 A fully-featured blog with:
 
 - Write, edit, and delete blog posts
+- Intelligent image management with automatic cleanup
 - Comment system with author names
 - Tag organization and filtering
-- Post sorting (date/title)
-- Image support for posts
+- Post sorting and pagination
+- Multiple image options (upload or URL)
 - Secure admin authentication
 - Norwegian date formatting
+- Separate landing page and blog listing
 - Custom 404 error page
 - About page
 
@@ -98,11 +100,49 @@ Building this incrementally, starting simple and adding features step by step.
 
 ## Technologies Used
 
-- **Backend:** Flask (Python)
+- **Backend:** Flask 3.1.2 (Python)
 - **Database:** SQLite3
 - **Templates:** Jinja2
+- **Testing:** pytest 9.0.2
+- **Environment Management:** python-dotenv 1.0.1
 - **Version Control:** Git/GitHub
 - **Security:** Flask sessions, environment variables
+
+## Key Features
+
+### Intelligent Image Management
+
+- **Multiple input options**: Upload files or provide image URLs
+- **Automatic cleanup**: Uploaded images are automatically deleted when:
+  - A post is deleted
+  - An image is replaced with a new one during editing
+  - Switching from uploaded image to URL
+- **Unique filenames**: UUID-based naming prevents filename collisions
+- **File validation**: Supports PNG, JPG, JPEG, GIF, WebP (max 5MB)
+- **Safe storage**: All uploads stored in dedicated `static/uploads/` directory
+
+### Content Organization
+
+- **Pagination**: Blog posts displayed 6 per page with page navigation
+- **Flexible sorting**: Sort posts by newest, oldest, or alphabetical
+- **Tag system**: Filter posts by tags, with tag suggestions in forms
+- **Dual page structure**:
+  - Landing page with hero section and 3 featured posts
+  - Separate blog listing page with full pagination
+
+### Comments System
+
+- **Public commenting**: Anyone can leave comments (no login required)
+- **Anonymous support**: Comments default to "Anonymous" if no name provided
+- **Admin moderation**: Only logged-in admins can delete comments
+- **Timestamps**: Automatic date/time stamping for all comments
+
+### Security & Authentication
+
+- **Protected routes**: Admin-only access for creating, editing, and deleting content
+- **Session management**: Flask sessions for secure login state
+- **Environment variables**: Sensitive credentials stored safely in `.env` file
+- **Flash messages**: User feedback for all actions (success/error states)
 
 ## Project Structure
 
@@ -114,9 +154,11 @@ personal-blog/
 ├── blog.db               # SQLite database
 ├── .env                  # Environment variables (not in git)
 ├── requirements.txt      # Python dependencies
+├── SECURITY.md           # Security policy and guidelines
 ├── templates/
 │   ├── base.html        # Base template with header/footer
 │   ├── home.html        # Home page with posts list
+│   ├── blog.html        # Blog posts listing page
 │   ├── post.html        # Individual post with comments
 │   ├── login.html       # Login page
 │   ├── new_post.html    # Create new post form
@@ -126,7 +168,12 @@ personal-blog/
 │   └── 404.html         # Custom 404 error page
 ├── static/
 │   ├── style.css        # Complete styling system
-│   └── logo.png         # Blog logo
+│   ├── logo.png         # Blog logo
+│   └── uploads/         # Uploaded images for posts
+├── tests/
+│   ├── test_app.py      # Flask application tests
+│   └── test_database.py # Database function tests
+├── venv/                 # Virtual environment (not in git)
 └── .gitignore           # Git ignore file
 ```
 
@@ -142,7 +189,7 @@ personal-blog/
 
 ```bash
 # Clone the repository
-git clone [your-repo-url]
+git clone https://github.com/Clockert/personal-blog.git
 cd personal-blog
 
 # Create virtual environment
@@ -170,6 +217,35 @@ Visit `http://localhost:5000`
 
 Set these in your `.env` file (see `.env.example`)
 
+## Testing
+
+The project includes automated tests for both the Flask application and database functions.
+
+### Running Tests
+
+```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_app.py
+pytest tests/test_database.py
+
+# Run with coverage report
+pytest --cov=. --cov-report=html
+```
+
+### Test Structure
+
+- **test_app.py** - Tests for Flask routes, authentication, CRUD operations, and error handling
+- **test_database.py** - Tests for database functions including post creation, retrieval, updates, and tag management
+
 ## Current Status
 
 **Phase:** Complete! All planned features implemented
@@ -177,71 +253,34 @@ Set these in your `.env` file (see `.env.example`)
 **Features:**
 
 - ✅ Full CRUD operations (Create, Read, Update, Delete) for posts
-- ✅ Comment system with delete functionality
-- ✅ Tag-based filtering and organization
-- ✅ Post sorting (newest/oldest/alphabetical)
+- ✅ Intelligent image management with automatic cleanup on delete/replace
+- ✅ Multiple image options (file upload with 5MB limit or URL)
+- ✅ Comment system with anonymous support and admin moderation
+- ✅ Tag-based filtering and organization with suggestions
+- ✅ Post pagination (6 posts per page) and sorting (newest/oldest/alphabetical)
+- ✅ Dual page structure (landing page with hero + blog listing)
 - ✅ User authentication with protected routes
 - ✅ Norwegian date formatting (DD mon YYYY)
-- ✅ Image support for blog posts
+- ✅ UUID-based unique filename generation for uploads
 - ✅ Custom 404 error handling
 - ✅ About page
 - ✅ Responsive UI
 - ✅ Flash messages for user feedback
-
-## Learning Notes
-
-Key things I've learned:
-
-- Virtual environments keep project dependencies isolated
-- `@app.route()` decorator maps URLs to Python functions
-- Jinja2 templates let you separate logic from presentation
-- SQLite is lightweight but powerful for small projects
-- Sessions track user state across requests
-- Environment variables protect sensitive data
-- Git branches help organize feature development
-
-## Challenges & Solutions
-
-_(These are documented in more detail in my reflective journal)_
-
-### Terminal Navigation
-
-- **Challenge:** Not comfortable with terminal commands - usually use GUI tools
-  - **Solution:** Started to use VS Codes integrated terminal that opens directly in my project folder. Started with just a few essential commands: `python app.py`, `source venv/bin/activate`, and `python`. Getting more comfortable with practice.
-
-### Understanding Flask's Request-Response Cycle
-
-- **Challenge:** Understanding how `@app.route()` connects URLs to Python functions
-  - **Solution:** Started with simplest possible "Hello World", then gradually added complexity. Drawing out the flow helped: Browser → Flask route → Python function → Template → Browser
-
-### Moving from Hardcoded Data to Database
-
-- **Challenge:** Had working code with Python lists, felt scary to change everything
-  - **Solution:** Used Git branches, Created `add-database` branch so I could experiment without breaking working code. Could always go back if needed. This made me feel safe to try new things.
-
-### Python Interactive Shell for Database
-
-- **Challenge:** Adding data to database using Python shell was confusing - didn't fully understand the `>>>` prompt
-  - **Solution:** Realized the Python shell is just typing Python commands one at a time instead of in a file. Used it to test database queries before adding them to my code.
-
-### Sessions and Login State
-
-- **Challenge:** Understanding how Flask "remembers" that I'm logged in between page loads
-  - **Solution:** Learned that sessions store data in encrypted cookies. The `session['logged_in']` is stored in the browser and sent with each request. This clicked when I saw the logout function removing it from the session.
+- ✅ Automated testing with pytest
 
 ## Potential Future Enhancements
 
 Ideas for further development:
 
 - Rich text editor for markdown support
-- More options for images
 - Search functionality across posts
 - Multiple user roles (admin, editor, viewer)
 - Post drafts and scheduling
 - Comment replies/threading
 - Email notifications
 - Post categories (in addition to tags)
-- Better Design and personalisation
+- Image compression and optimization
+- Better design and personalization
 
 ## Course Information
 
