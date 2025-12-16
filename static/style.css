@@ -504,6 +504,47 @@ a.tag {
   border-bottom: 1px solid var(--color-card-border);
 }
 
+.tags-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.tags-toggle-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.tags-toggle-inline:hover {
+  background: rgba(138, 62, 170, 0.05);
+}
+
+.tags-toggle-inline .material-symbols-outlined {
+  font-size: 1.25rem;
+  color: var(--color-accent);
+}
+
+.tags-toggle-inline .chevron {
+  transition: transform 0.3s ease;
+}
+
+.tags-toggle-inline .chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.tags-list-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
 /* ===========================
    14. Create Post Form
    =========================== */
