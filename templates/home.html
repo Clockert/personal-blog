@@ -1,89 +1,61 @@
-{% extends "base.html" %} {% block title %}Home - My Blog{% endblock %} {% block
-content %}
-<div class="posts-container">
-  <div class="posts-header">
-    <h2>Recent Posts</h2>
-    {% if session.logged_in %}
-    <a href="/post/new" class="btn-new-post">+ New Post</a>
-    {% endif %}
-  </div>
+{% extends "base.html" %}
+{% block title %}Welcome - My Blog{% endblock %}
 
-  <!-- Filter and Sort Bar -->
-  <div class="filter-sort-bar">
-    <!-- Browse by Tags Section -->
-    {% if tags %}
-    <div class="tags-section">
-      <div class="tags-toggle-inline" onclick="toggleTags()">
-        <span class="material-symbols-outlined">label</span>
-        <span>Browse Tags</span>
-        <span class="material-symbols-outlined chevron" id="chevron">expand_more</span>
-      </div>
-      <div class="tags-list-inline" id="tagsList" style="display: none">
-        {% for tag in tags %}
-        <a href="/tag/{{ tag }}" class="tag tag-browse">{{ tag }}</a>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- Sort Dropdown -->
-    <div class="sort-dropdown">
-      <label for="sortSelect">Sort by:</label>
-      <select id="sortSelect" onchange="window.location.href='/?sort=' + this.value">
-        <option value="date_desc" {% if current_sort == 'date_desc' %}selected{% endif %}>Newest First</option>
-        <option value="date_asc" {% if current_sort == 'date_asc' %}selected{% endif %}>Oldest First</option>
-        <option value="title_asc" {% if current_sort == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
-        <option value="title_desc" {% if current_sort == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
-      </select>
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Welcome to My Blog</h1>
+    <p class="hero-description">
+      Exploring code, sharing insights, and documenting my journey as a developer.
+      Join me as I learn, build, and grow in the world of software development.
+    </p>
+    <div class="hero-actions">
+      <a href="/blog" class="btn-hero-primary">Read the Blog</a>
+      <a href="/about" class="btn-hero-secondary">About Me</a>
     </div>
   </div>
+</section>
 
-  {% for post in posts %}
-  <a href="/post/{{ post.id }}" class="post-preview-link">
-    <article class="post-preview">
-      {% if post.image_url %}
-      <div class="post-image">
-        <img src="{{ post.image_url }}" alt="{{ post.title }}" />
-      </div>
-      {% endif %}
+<!-- Featured Posts Section -->
+<section class="featured-posts">
+  <h2>Featured Posts</h2>
 
-      <div class="post-heading">
-        <h3>{{ post.title }}</h3>
-        <p class="post-meta">Published on {{ post.date|norwegian_date }}</p>
-
-        {% if post.tags %}
-        <div class="post-tags">
-          {% for tag in post.tags.split(', ') %}
-          <span class="tag" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/tag/{{ tag }}';">{{ tag }}</span>
-          {% endfor %}
+  {% if featured_posts %}
+  <div class="featured-grid">
+    {% for post in featured_posts %}
+    <a href="/blog/{{ post.id }}" class="featured-post-link">
+      <article class="featured-post">
+        {% if post.image_url %}
+        <div class="featured-post-image">
+          <img src="{{ post.image_url }}" alt="{{ post.title }}" />
         </div>
         {% endif %}
-      </div>
 
-      <p class="post-excerpt">{{ post.excerpt }}</p>
+        <div class="featured-post-content">
+          <h3>{{ post.title }}</h3>
+          <p class="post-meta">{{ post.date|norwegian_date }}</p>
 
-      <span class="read-more">Read more →</span>
-    </article>
-  </a>
-  {% endfor %}
+          {% if post.tags %}
+          <div class="post-tags">
+            {% for tag in post.tags.split(', ') %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
 
-  <!-- Pagination Controls -->
-  {% if total_pages > 1 %}
-  <div class="pagination">
-    {% if page > 1 %}
-    <a href="/?page={{ page - 1 }}&sort={{ current_sort }}" class="pagination-btn">← Previous</a>
-    {% else %}
-    <span class="pagination-btn disabled">← Previous</span>
-    {% endif %}
-
-    <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
-
-    {% if page < total_pages %}
-    <a href="/?page={{ page + 1 }}&sort={{ current_sort }}" class="pagination-btn">Next →</a>
-    {% else %}
-    <span class="pagination-btn disabled">Next →</span>
-    {% endif %}
+          <p class="featured-post-excerpt">{{ post.excerpt }}</p>
+        </div>
+      </article>
+    </a>
+    {% endfor %}
   </div>
+
+  <div class="view-all-posts">
+    <a href="/blog" class="btn-view-all">View All Posts →</a>
+  </div>
+  {% else %}
+  <p class="no-posts">No posts yet. Check back soon!</p>
   {% endif %}
-</div>
+</section>
 {% endblock %}
