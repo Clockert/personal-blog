@@ -13,7 +13,6 @@ A fully-featured blog with:
 - Post sorting and pagination
 - Multiple image options (upload or URL)
 - Secure admin authentication
-- Norwegian date formatting
 - Separate landing page and blog listing
 - Custom 404 error page
 - About page
@@ -240,6 +239,7 @@ Visit `http://localhost:5000`
 ### Login Credentials
 
 Create a `.env` file with:
+
 ```bash
 SECRET_KEY=your-secret-key-here
 ADMIN_USERNAME=admin
@@ -247,6 +247,7 @@ ADMIN_PASSWORD_HASH=your-hashed-password-here
 ```
 
 **To generate a password hash:**
+
 ```bash
 python generate_password_hash.py
 # Enter your password when prompted
