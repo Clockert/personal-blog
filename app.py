@@ -4,6 +4,8 @@ from database import get_all_posts, get_post_by_id, create_post, update_post, de
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from werkzeug.utils import secure_filename
+import uuid
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,6 +15,14 @@ app = Flask(__name__)
 
 # Set secret key for sessions (needed for login)
 app.secret_key = os.getenv('SECRET_KEY')
+
+# Configure file upload settings
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # Custom Jinja2 filter for Norwegian date format
 @app.template_filter('norwegian_date')
@@ -37,6 +47,29 @@ def norwegian_date_filter(date_string):
     except:
         # If parsing fails, return original string
         return date_string
+
+# Helper functions for file uploads
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_uploaded_file(file):
+    """Save uploaded file and return the URL path"""
+    if file and allowed_file(file.filename):
+        # Generate unique filename to avoid collisions
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        unique_filename = f"{uuid.uuid4().hex}.{ext}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+
+        # Ensure upload directory exists
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+        # Save the file
+        file.save(filepath)
+
+        # Return URL path relative to static folder
+        return f"/static/uploads/{unique_filename}"
+    return None
 
 # Get admin credentials from environment
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
@@ -162,7 +195,24 @@ def new_post():
         content = request.form['content']
         excerpt = request.form['excerpt']
         tags = request.form.get('tags', '')  # Optional field
-        image_url = request.form.get('image_url', None)  # Optional field
+
+        # Handle image - either upload or URL
+        image_url = None
+        image_option = request.form.get('image_option', 'upload')
+
+        if image_option == 'upload':
+            # Handle file upload
+            if 'image_file' in request.files:
+                file = request.files['image_file']
+                if file.filename != '':
+                    image_url = save_uploaded_file(file)
+                    if image_url is None:
+                        flash('Invalid file type. Please upload a valid image (PNG, JPG, GIF, WebP).', 'error')
+        elif image_option == 'url':
+            # Handle URL
+            image_url = request.form.get('image_url', None)
+            if image_url and image_url.strip() == '':
+                image_url = None
 
         # Get current date
         from datetime import datetime
@@ -197,7 +247,46 @@ def edit_post(post_id):
         content = request.form['content']
         excerpt = request.form['excerpt']
         tags = request.form.get('tags', '')
-        image_url = request.form.get('image_url', None)
+
+        # Handle image - either upload, URL, or keep existing
+        old_image_url = post['image_url']  # Save old image URL for cleanup
+        image_url = post['image_url']  # Default to existing image
+        image_option = request.form.get('image_option', 'keep')
+
+        if image_option == 'upload':
+            # Handle file upload
+            if 'image_file' in request.files:
+                file = request.files['image_file']
+                if file.filename != '':
+                    new_image_url = save_uploaded_file(file)
+                    if new_image_url:
+                        image_url = new_image_url
+                        # Delete old uploaded image if it exists
+                        if old_image_url and old_image_url.startswith('/static/uploads/'):
+                            old_filename = old_image_url.split('/')[-1]
+                            old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                            if os.path.exists(old_filepath):
+                                try:
+                                    os.remove(old_filepath)
+                                except Exception as e:
+                                    print(f"Error deleting old image: {e}")
+                    else:
+                        flash('Invalid file type. Please upload a valid image (PNG, JPG, GIF, WebP).', 'error')
+        elif image_option == 'url':
+            # Handle URL
+            image_url = request.form.get('image_url', None)
+            if image_url and image_url.strip() == '':
+                image_url = None
+            # Delete old uploaded image if switching to URL
+            if image_url != old_image_url and old_image_url and old_image_url.startswith('/static/uploads/'):
+                old_filename = old_image_url.split('/')[-1]
+                old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                if os.path.exists(old_filepath):
+                    try:
+                        os.remove(old_filepath)
+                    except Exception as e:
+                        print(f"Error deleting old image: {e}")
+        # If image_option == 'keep', image_url stays as post['image_url']
 
         # Keep the original date
         date = post['date']
@@ -215,11 +304,26 @@ def edit_post(post_id):
 # Delete post route
 @app.route('/blog/<int:post_id>/delete', methods=['POST'])
 def delete_post_route(post_id):
-    """Delete a blog post"""
+    """Delete a blog post and its associated uploaded image"""
     # Check if user is logged in
     if not session.get('logged_in'):
         flash('Please log in to delete posts', 'error')
         return redirect(url_for('login'))
+
+    # Get the post to check for uploaded image
+    post = get_post_by_id(post_id)
+    if post and post.get('image_url'):
+        # Check if it's an uploaded file (starts with /static/uploads/)
+        if post['image_url'].startswith('/static/uploads/'):
+            # Extract filename and delete the file
+            filename = post['image_url'].split('/')[-1]
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except Exception as e:
+                    # Log error but continue with post deletion
+                    print(f"Error deleting image file: {e}")
 
     # Delete the post
     delete_post(post_id)
