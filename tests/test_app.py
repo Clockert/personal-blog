@@ -33,7 +33,7 @@ def client():
     database.init_db()
 
     # Add a test post
-    database.create_post('Test Post', '2025-12-15', 'Test content for testing', 'Test excerpt', None, 'test, flask')
+    database.create_post('Test Post', 'Test content for testing', 'Test excerpt', None, 'test, flask')
 
     with app.test_client() as client:
         yield client
@@ -161,7 +161,7 @@ def test_blog_pagination(client):
         session['username'] = 'admin'
 
     for i in range(8):
-        database.create_post(f'Post {i}', '2025-12-15', 'Content', 'Excerpt', None, 'test')
+        database.create_post(f'Post {i}', 'Content', 'Excerpt', None, 'test')
 
     # Test page 1
     response = client.get('/blog?page=1')
