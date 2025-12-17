@@ -156,7 +156,6 @@ Building this incrementally, starting simple and adding features step by step.
   - Never stores plaintext passwords
   - Uses `werkzeug.security` for industry-standard hashing
   - Includes random salt to prevent rainbow table attacks
-  - Generate new hashes with: `python generate_password_hash.py`
 - **Server-side validation**: All inputs validated to prevent data corruption and DoS attacks
 - **Protected routes**: Admin-only access for creating, editing, and deleting content
 - **Session management**: Flask sessions for secure login state
@@ -171,7 +170,6 @@ personal-blog/
 ├── app.py                 # Main Flask application
 ├── database.py            # Database functions
 ├── validation.py          # Input validation functions
-├── generate_password_hash.py  # Password hash generator utility
 ├── schema.sql             # Database schema
 ├── blog.db               # SQLite database
 ├── .env                  # Environment variables (not in git)
@@ -246,12 +244,13 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=your-hashed-password-here
 ```
 
-**To generate a password hash:**
+**To generate a password hash** (using Python):
 
-```bash
-python generate_password_hash.py
-# Enter your password when prompted
-# Copy the hash to your .env file
+```python
+from werkzeug.security import generate_password_hash
+password = "your-password"
+hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+print(hash)  # Copy this to your .env file
 ```
 
 ## Testing
@@ -306,7 +305,8 @@ pytest --cov=. --cov-report=html
 - ✅ Post pagination (6 posts per page) and sorting (newest/oldest/alphabetical)
 - ✅ Dual page structure (landing page with hero + blog listing)
 - ✅ User authentication with protected routes
-- ✅ Norwegian date formatting (DD mon YYYY)
+- ✅ Timestamp tracking (created_at/updated_at) for accurate chronological sorting
+- ✅ Norwegian datetime formatting (DD mon YYYY - HH:MM)
 - ✅ UUID-based unique filename generation for uploads
 - ✅ Custom 404 error handling
 - ✅ About page
