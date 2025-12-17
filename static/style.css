@@ -262,9 +262,8 @@ main {
 }
 
 .post-excerpt {
-  margin-bottom: 1.3rem;
+  margin-bottom: 0.8rem;
   color: #374151;
-  margin-top: auto;
 }
 
 /* Read More Link */
@@ -273,6 +272,7 @@ main {
   font-weight: 600;
   text-decoration: none;
   transition: color 0.25s;
+  margin-top: auto;
 }
 
 .read-more:hover {
