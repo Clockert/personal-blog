@@ -278,11 +278,8 @@ def new_post():
             else:
                 image_url = None
 
-        # Get current date
-        date = datetime.now().strftime('%Y-%m-%d')
-
-        # Insert into database
-        create_post(title, date, content, excerpt, image_url, tags)
+        # Insert into database (timestamps handled automatically)
+        create_post(title, content, excerpt, image_url, tags)
 
         flash('Post created successfully!', 'success')
         return redirect(url_for('blog'))
