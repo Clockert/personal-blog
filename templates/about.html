@@ -23,7 +23,12 @@ block content %}
           to technical understanding, but to structure, scope control, and
           maintaining discipline as complexity increased.
         </p>
-
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/clutter.png') }}"
+            alt="Managing code complexity and organization"
+          />
+        </div>
         <p>
           Earlier attempts became too complex too quickly, with features added
           before the underlying concepts were fully understood. Long breaks
@@ -31,6 +36,13 @@ block content %}
           refactoring often felt overwhelming. These experiences highlighted the
           need for a more deliberate and structured approach.
         </p>
+
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/mvp.png') }}"
+            alt="MVP roadmap planning approach"
+          />
+        </div>
 
         <p>
           For the final iteration, I changed strategy before writing code by
@@ -57,6 +69,13 @@ block content %}
           CSS variables and Material Icons, and then intentionally stopped.
         </p>
 
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/back_vs_front.png') }}"
+            alt="Backend vs frontend development focus"
+          />
+        </div>
+
         <p>
           Although further visual refinement would have been comfortable, it
           would not have contributed meaningfully to the learning goals of a
@@ -78,6 +97,13 @@ block content %}
           were optimistic and based on ideal conditions. As a result,
           prioritization became unavoidable rather than optional.
         </p>
+
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/time.png') }}"
+            alt="Working under time constraints"
+          />
+        </div>
 
         <p>
           In this context, the MVP roadmap proved especially valuable. Limited
@@ -130,6 +156,13 @@ block content %}
           implementation.
         </p>
 
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/ai.png') }}"
+            alt="Responsible AI usage in development"
+          />
+        </div>
+
         <p>
           I used AI to assist with repetitive tasks and structural improvements
           in areas where I already had more experience, particularly
@@ -165,11 +198,25 @@ block content %}
           expected behaviour, but about uncovering hidden assumptions.
         </p>
 
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/tests.png') }}"
+            alt="Automated testing and code confidence"
+          />
+        </div>
+
         <p>
           Test coverage also made it easier to make changes without fear of
           breaking existing functionality, reinforcing the value of testing as
           part of a professional backend workflow, particularly when working
           incrementally and under time constraints.
+        </p>
+        <p>
+          While finishing the project, I discovered that posts created on the
+          same day were not sorting correctly because only dates, not
+          timestamps, were stored. Adding full created_at and updated_at
+          timestamps resolved the issue. This highlighted the importance of
+          precise data storage in backend design.
         </p>
       </div>
     </section>
@@ -188,6 +235,13 @@ block content %}
           of backend security as an integral part of application design, rather
           than something added after functionality is complete.
         </p>
+
+        <div class="journal-image">
+          <img
+            src="{{ url_for('static', filename='photos/security.png') }}"
+            alt="Security considerations in backend development"
+          />
+        </div>
       </div>
     </section>
 

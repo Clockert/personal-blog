@@ -907,6 +907,19 @@ a.tag {
   color: var(--color-heading);
 }
 
+.journal-image {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.journal-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-sm);
+}
+
 .tech-stack,
 .course-info {
   margin: 2.5rem 0;
