@@ -66,17 +66,18 @@ def get_post_by_id(post_id):
 def create_post(title, content, excerpt, image_url, tags):
     """Insert a new post into the database
 
-    Timestamps (created_at, updated_at) are automatically set by the database.
+    Timestamps (created_at, updated_at) are explicitly set in UTC.
     The date field is set to current date for display purposes.
     """
     conn = get_db_connection()
-    # Generate display date
+    # Generate display date and timestamps
     date = datetime.now().strftime('%Y-%m-%d')
-    # created_at and updated_at are automatically set by database DEFAULT
+    timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+
     conn.execute('''
-        INSERT INTO posts (title, date, content, excerpt, image_url, tags)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (title, date, content, excerpt, image_url, tags))
+        INSERT INTO posts (title, date, content, excerpt, image_url, tags, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (title, date, content, excerpt, image_url, tags, timestamp, timestamp))
     conn.commit()
     conn.close()
 
