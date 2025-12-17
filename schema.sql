@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS posts (
     content TEXT NOT NULL,
     excerpt TEXT NOT NULL,
     image_url TEXT,
-    tags TEXT
+    tags TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Comments table

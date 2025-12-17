@@ -50,7 +50,7 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 # Custom Jinja2 filter for Norwegian date format
 @app.template_filter('norwegian_date')
 def norwegian_date_filter(date_string):
-    """Convert date from YYYY-MM-DD to DD mon YYYY (Norwegian months)"""
+    """Convert date from YYYY-MM-DD to DD mon YYYY (Norwegian style)"""
     try:
         # Parse the date string
         date_obj = datetime.strptime(date_string, '%Y-%m-%d')
@@ -70,6 +70,19 @@ def norwegian_date_filter(date_string):
     except:
         # If parsing fails, return original string
         return date_string
+
+@app.template_filter('norwegian_datetime')
+def norwegian_datetime_filter(datetime_string):
+    """Convert datetime to DD mon YYYY - HH:MM format (e.g., 17 des 2025 - 14:30)"""
+    try:
+        dt_obj = datetime.strptime(datetime_string, '%Y-%m-%d %H:%M:%S')
+        norwegian_months = {
+            1: 'jan', 2: 'feb', 3: 'mar', 4: 'apr', 5: 'mai', 6: 'jun',
+            7: 'jul', 8: 'aug', 9: 'sep', 10: 'okt', 11: 'nov', 12: 'des'
+        }
+        return f"{dt_obj.day:02d} {norwegian_months[dt_obj.month]} {dt_obj.year} - {dt_obj.hour:02d}:{dt_obj.minute:02d}"
+    except:
+        return datetime_string
 
 # -----------------------------------------------------------------------------
 # 3. File Upload Helpers
@@ -278,11 +291,8 @@ def new_post():
             else:
                 image_url = None
 
-        # Get current date
-        date = datetime.now().strftime('%Y-%m-%d')
-
-        # Insert into database
-        create_post(title, date, content, excerpt, image_url, tags)
+        # Insert into database (timestamps handled automatically)
+        create_post(title, content, excerpt, image_url, tags)
 
         flash('Post created successfully!', 'success')
         return redirect(url_for('blog'))

@@ -34,7 +34,7 @@
 
         <div class="featured-post-content">
           <h3>{{ post.title }}</h3>
-          <p class="post-meta">{{ post.date|norwegian_date }}</p>
+          <p class="post-meta">{{ post.created_at|norwegian_datetime }}</p>
 
           {% if post.tags %}
           <div class="post-tags">

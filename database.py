@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timezone
 
 # Database file path
 DATABASE = 'blog.db'
@@ -31,13 +32,13 @@ def get_all_posts(sort_by='date_desc', limit=None, offset=0):
 
     # Determine ORDER BY clause based on sort_by parameter
     if sort_by == 'date_asc':
-        order_clause = 'ORDER BY date ASC'
+        order_clause = 'ORDER BY created_at ASC, id ASC'
     elif sort_by == 'title_asc':
         order_clause = 'ORDER BY title ASC'
     elif sort_by == 'title_desc':
         order_clause = 'ORDER BY title DESC'
     else:  # default to date_desc
-        order_clause = 'ORDER BY date DESC'
+        order_clause = 'ORDER BY created_at DESC, id DESC'
 
     # Add LIMIT and OFFSET if specified
     query = f'SELECT * FROM posts {order_clause}'
@@ -62,24 +63,37 @@ def get_post_by_id(post_id):
     conn.close()
     return post
 
-def create_post(title, date, content, excerpt, image_url, tags):
-    """Insert a new post into the database"""
+def create_post(title, content, excerpt, image_url, tags):
+    """Insert a new post into the database
+
+    Timestamps (created_at, updated_at) are explicitly set in UTC.
+    The date field is set to current date for display purposes.
+    """
     conn = get_db_connection()
+    # Generate display date and timestamps
+    date = datetime.now().strftime('%Y-%m-%d')
+    timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+
     conn.execute('''
-        INSERT INTO posts (title, date, content, excerpt, image_url, tags)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (title, date, content, excerpt, image_url, tags))
+        INSERT INTO posts (title, date, content, excerpt, image_url, tags, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (title, date, content, excerpt, image_url, tags, timestamp, timestamp))
     conn.commit()
     conn.close()
 
 def update_post(post_id, title, date, content, excerpt, image_url, tags):
-    """Update an existing post in the database"""
+    """Update an existing post in the database
+
+    Updates the updated_at timestamp automatically.
+    """
     conn = get_db_connection()
+    # Generate current timestamp for updated_at
+    updated_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
     conn.execute('''
-        UPDATE posts 
-        SET title = ?, date = ?, content = ?, excerpt = ?, image_url = ?, tags = ?
+        UPDATE posts
+        SET title = ?, date = ?, content = ?, excerpt = ?, image_url = ?, tags = ?, updated_at = ?
         WHERE id = ?
-    ''', (title, date, content, excerpt, image_url, tags, post_id))
+    ''', (title, date, content, excerpt, image_url, tags, updated_at, post_id))
     conn.commit()
     conn.close()
 
@@ -96,7 +110,7 @@ def get_posts_by_tag(tag):
     # Use LIKE to search for the tag in the tags column
     # Add wildcards to match tag anywhere in the string
     posts = conn.execute(
-        "SELECT * FROM posts WHERE tags LIKE ? ORDER BY date DESC",
+        "SELECT * FROM posts WHERE tags LIKE ? ORDER BY created_at DESC, id DESC",
         (f'%{tag}%',)
     ).fetchall()
     conn.close()
